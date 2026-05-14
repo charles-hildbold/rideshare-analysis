@@ -1,0 +1,9 @@
+# never commit the raw personal data
+*.csv
+driver_payments*
+driver_lifetime*
+driver_rides*
+driver_sessions*
+payments_*
+gridwise*
+*.xlsx
