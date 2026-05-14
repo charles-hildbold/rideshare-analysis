@@ -40,7 +40,7 @@ charts. The write-up is a single self-contained HTML page.
 
 ## See it live
 
-[Link goes here once Pages is set up — see Step 4]
+https://charles-hildbold.github.io/rideshare-analysis/
 
 ## Notes
 
