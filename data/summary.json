@@ -1,0 +1,1435 @@
+{
+ "period": "January 1, 2023 \u2013 May 9, 2026",
+ "lifetime": {
+  "days_period": 1222,
+  "days_active": 1040,
+  "pct_active": 85.1,
+  "trips": 25549,
+  "hours": 7876.4,
+  "miles": 158940.2,
+  "earn": 327729.24,
+  "gross_earn": 325861.08,
+  "settlement": 1868.16,
+  "tax_ded": 108278.36,
+  "taxable": 219450.88,
+  "dollar_per_hour": 41.61,
+  "dollar_per_mile": 2.06,
+  "dollar_per_trip": 12.83,
+  "avg_speed_mph": 20.2,
+  "rides_per_hour": 3.24
+ },
+ "annual": [
+  {
+   "year": 2023,
+   "days": 306,
+   "trips": 7565,
+   "earn": 94276.83,
+   "hours": 2242.6,
+   "miles": 44730.4,
+   "ded": 29298.53,
+   "taxable": 64978.0,
+   "dollar_per_hour": 42.04,
+   "dollar_per_mile": 2.11,
+   "dollar_per_trip": 12.46,
+   "dollar_per_day": 308.0
+  },
+  {
+   "year": 2024,
+   "days": 312,
+   "trips": 7595,
+   "earn": 97906.05,
+   "hours": 2283.9,
+   "miles": 46882.3,
+   "ded": 31411.29,
+   "taxable": 66495.0,
+   "dollar_per_hour": 42.87,
+   "dollar_per_mile": 2.09,
+   "dollar_per_trip": 12.89,
+   "dollar_per_day": 314.0
+  },
+  {
+   "year": 2025,
+   "days": 312,
+   "trips": 7718,
+   "earn": 98752.56,
+   "hours": 2462.5,
+   "miles": 49754.2,
+   "ded": 34827.94,
+   "taxable": 63925.0,
+   "dollar_per_hour": 40.1,
+   "dollar_per_mile": 1.98,
+   "dollar_per_trip": 12.8,
+   "dollar_per_day": 317.0
+  },
+  {
+   "year": 2026,
+   "days": 110,
+   "trips": 2671,
+   "earn": 36793.8,
+   "hours": 887.4,
+   "miles": 17573.3,
+   "ded": 12740.6,
+   "taxable": 24053.0,
+   "dollar_per_hour": 41.46,
+   "dollar_per_mile": 2.09,
+   "dollar_per_trip": 13.78,
+   "dollar_per_day": 334.0
+  }
+ ],
+ "service_split": {
+  "uber_trips": 24781,
+  "lyft_trips": 768,
+  "uber_earn": 316376.26,
+  "lyft_earn": 9484.82,
+  "uber_per_trip": 12.77,
+  "lyft_per_trip": 12.35
+ },
+ "dow": [
+  {
+   "day": "Mon",
+   "days": 135,
+   "trips": 3140,
+   "earn": 32944.24,
+   "dollar_per_day": 244.0,
+   "dollar_per_hour": 33.11
+  },
+  {
+   "day": "Tue",
+   "days": 77,
+   "trips": 1835,
+   "earn": 20915.78,
+   "dollar_per_day": 272.0,
+   "dollar_per_hour": 36.71
+  },
+  {
+   "day": "Wed",
+   "days": 156,
+   "trips": 3725,
+   "earn": 45824.52,
+   "dollar_per_day": 294.0,
+   "dollar_per_hour": 39.28
+  },
+  {
+   "day": "Thu",
+   "days": 165,
+   "trips": 3788,
+   "earn": 49372.48,
+   "dollar_per_day": 299.0,
+   "dollar_per_hour": 40.83
+  },
+  {
+   "day": "Fri",
+   "days": 172,
+   "trips": 4563,
+   "earn": 52864.81,
+   "dollar_per_day": 307.0,
+   "dollar_per_hour": 37.99
+  },
+  {
+   "day": "Sat",
+   "days": 171,
+   "trips": 4986,
+   "earn": 77547.95,
+   "dollar_per_day": 453.0,
+   "dollar_per_hour": 53.24
+  },
+  {
+   "day": "Sun",
+   "days": 164,
+   "trips": 3512,
+   "earn": 46391.3,
+   "dollar_per_day": 283.0,
+   "dollar_per_hour": 42.64
+  }
+ ],
+ "monthly": [
+  {
+   "date": "2023-01-01",
+   "earn": 6853.06,
+   "hours": 182.0,
+   "trips": 661,
+   "dollar_per_hour": 37.65
+  },
+  {
+   "date": "2023-02-01",
+   "earn": 6989.7,
+   "hours": 165.0,
+   "trips": 601,
+   "dollar_per_hour": 42.36
+  },
+  {
+   "date": "2023-03-01",
+   "earn": 7399.65,
+   "hours": 177.0,
+   "trips": 599,
+   "dollar_per_hour": 41.81
+  },
+  {
+   "date": "2023-04-01",
+   "earn": 6546.92,
+   "hours": 147.0,
+   "trips": 519,
+   "dollar_per_hour": 44.54
+  },
+  {
+   "date": "2023-05-01",
+   "earn": 6710.31,
+   "hours": 163.1,
+   "trips": 541,
+   "dollar_per_hour": 41.14
+  },
+  {
+   "date": "2023-06-01",
+   "earn": 8357.78,
+   "hours": 192.1,
+   "trips": 646,
+   "dollar_per_hour": 43.51
+  },
+  {
+   "date": "2023-07-01",
+   "earn": 8787.06,
+   "hours": 205.4,
+   "trips": 683,
+   "dollar_per_hour": 42.78
+  },
+  {
+   "date": "2023-08-01",
+   "earn": 8274.2,
+   "hours": 199.6,
+   "trips": 645,
+   "dollar_per_hour": 41.45
+  },
+  {
+   "date": "2023-09-01",
+   "earn": 9330.44,
+   "hours": 204.0,
+   "trips": 668,
+   "dollar_per_hour": 45.74
+  },
+  {
+   "date": "2023-10-01",
+   "earn": 9248.19,
+   "hours": 199.6,
+   "trips": 671,
+   "dollar_per_hour": 46.33
+  },
+  {
+   "date": "2023-11-01",
+   "earn": 7799.51,
+   "hours": 199.4,
+   "trips": 658,
+   "dollar_per_hour": 39.11
+  },
+  {
+   "date": "2023-12-01",
+   "earn": 7980.01,
+   "hours": 208.4,
+   "trips": 673,
+   "dollar_per_hour": 38.29
+  },
+  {
+   "date": "2024-01-01",
+   "earn": 7271.74,
+   "hours": 194.9,
+   "trips": 627,
+   "dollar_per_hour": 37.31
+  },
+  {
+   "date": "2024-02-01",
+   "earn": 11366.07,
+   "hours": 187.9,
+   "trips": 625,
+   "dollar_per_hour": 60.49
+  },
+  {
+   "date": "2024-03-01",
+   "earn": 6762.22,
+   "hours": 163.5,
+   "trips": 534,
+   "dollar_per_hour": 41.36
+  },
+  {
+   "date": "2024-04-01",
+   "earn": 7772.26,
+   "hours": 185.2,
+   "trips": 605,
+   "dollar_per_hour": 41.97
+  },
+  {
+   "date": "2024-05-01",
+   "earn": 8013.27,
+   "hours": 195.5,
+   "trips": 635,
+   "dollar_per_hour": 40.99
+  },
+  {
+   "date": "2024-06-01",
+   "earn": 7387.15,
+   "hours": 184.7,
+   "trips": 618,
+   "dollar_per_hour": 40.0
+  },
+  {
+   "date": "2024-07-01",
+   "earn": 8164.72,
+   "hours": 214.0,
+   "trips": 719,
+   "dollar_per_hour": 38.15
+  },
+  {
+   "date": "2024-08-01",
+   "earn": 8384.53,
+   "hours": 210.0,
+   "trips": 755,
+   "dollar_per_hour": 39.93
+  },
+  {
+   "date": "2024-09-01",
+   "earn": 8105.42,
+   "hours": 186.5,
+   "trips": 651,
+   "dollar_per_hour": 43.46
+  },
+  {
+   "date": "2024-10-01",
+   "earn": 8353.74,
+   "hours": 182.5,
+   "trips": 613,
+   "dollar_per_hour": 45.77
+  },
+  {
+   "date": "2024-11-01",
+   "earn": 8094.04,
+   "hours": 189.3,
+   "trips": 609,
+   "dollar_per_hour": 42.76
+  },
+  {
+   "date": "2024-12-01",
+   "earn": 8230.89,
+   "hours": 189.9,
+   "trips": 604,
+   "dollar_per_hour": 43.34
+  },
+  {
+   "date": "2025-01-01",
+   "earn": 8087.63,
+   "hours": 198.7,
+   "trips": 627,
+   "dollar_per_hour": 40.7
+  },
+  {
+   "date": "2025-02-01",
+   "earn": 7128.47,
+   "hours": 179.4,
+   "trips": 560,
+   "dollar_per_hour": 39.74
+  },
+  {
+   "date": "2025-03-01",
+   "earn": 8800.25,
+   "hours": 209.5,
+   "trips": 647,
+   "dollar_per_hour": 42.01
+  },
+  {
+   "date": "2025-04-01",
+   "earn": 7666.81,
+   "hours": 194.3,
+   "trips": 610,
+   "dollar_per_hour": 39.46
+  },
+  {
+   "date": "2025-05-01",
+   "earn": 8746.71,
+   "hours": 212.9,
+   "trips": 639,
+   "dollar_per_hour": 41.08
+  },
+  {
+   "date": "2025-06-01",
+   "earn": 8258.47,
+   "hours": 206.0,
+   "trips": 645,
+   "dollar_per_hour": 40.09
+  },
+  {
+   "date": "2025-07-01",
+   "earn": 7800.35,
+   "hours": 207.9,
+   "trips": 665,
+   "dollar_per_hour": 37.52
+  },
+  {
+   "date": "2025-08-01",
+   "earn": 8086.16,
+   "hours": 208.3,
+   "trips": 693,
+   "dollar_per_hour": 38.82
+  },
+  {
+   "date": "2025-09-01",
+   "earn": 8112.17,
+   "hours": 208.7,
+   "trips": 678,
+   "dollar_per_hour": 38.87
+  },
+  {
+   "date": "2025-10-01",
+   "earn": 9579.68,
+   "hours": 235.5,
+   "trips": 749,
+   "dollar_per_hour": 40.68
+  },
+  {
+   "date": "2025-11-01",
+   "earn": 8663.32,
+   "hours": 209.0,
+   "trips": 652,
+   "dollar_per_hour": 41.45
+  },
+  {
+   "date": "2025-12-01",
+   "earn": 7822.54,
+   "hours": 192.3,
+   "trips": 553,
+   "dollar_per_hour": 40.68
+  },
+  {
+   "date": "2026-01-01",
+   "earn": 7753.14,
+   "hours": 208.4,
+   "trips": 636,
+   "dollar_per_hour": 37.2
+  },
+  {
+   "date": "2026-02-01",
+   "earn": 8310.3,
+   "hours": 194.3,
+   "trips": 579,
+   "dollar_per_hour": 42.77
+  },
+  {
+   "date": "2026-03-01",
+   "earn": 9318.38,
+   "hours": 204.2,
+   "trips": 625,
+   "dollar_per_hour": 45.63
+  },
+  {
+   "date": "2026-04-01",
+   "earn": 9199.9,
+   "hours": 223.2,
+   "trips": 658,
+   "dollar_per_hour": 41.22
+  },
+  {
+   "date": "2026-05-01",
+   "earn": 2212.08,
+   "hours": 57.3,
+   "trips": 173,
+   "dollar_per_hour": 38.61
+  }
+ ],
+ "marginal_hour_value": 51.54,
+ "session_intercept": -79.45,
+ "top_day": {
+  "date": "February 28, 2024 (Wednesday)",
+  "earn": 1920.98,
+  "hours": null,
+  "trips": 4
+ },
+ "hourly": [
+  {
+   "hour": 0,
+   "trips": 314
+  },
+  {
+   "hour": 1,
+   "trips": 19
+  },
+  {
+   "hour": 2,
+   "trips": 1
+  },
+  {
+   "hour": 3,
+   "trips": 0
+  },
+  {
+   "hour": 4,
+   "trips": 0
+  },
+  {
+   "hour": 5,
+   "trips": 0
+  },
+  {
+   "hour": 6,
+   "trips": 0
+  },
+  {
+   "hour": 7,
+   "trips": 0
+  },
+  {
+   "hour": 8,
+   "trips": 0
+  },
+  {
+   "hour": 9,
+   "trips": 1
+  },
+  {
+   "hour": 10,
+   "trips": 8
+  },
+  {
+   "hour": 11,
+   "trips": 18
+  },
+  {
+   "hour": 12,
+   "trips": 33
+  },
+  {
+   "hour": 13,
+   "trips": 81
+  },
+  {
+   "hour": 14,
+   "trips": 216
+  },
+  {
+   "hour": 15,
+   "trips": 984
+  },
+  {
+   "hour": 16,
+   "trips": 2184
+  },
+  {
+   "hour": 17,
+   "trips": 2702
+  },
+  {
+   "hour": 18,
+   "trips": 3190
+  },
+  {
+   "hour": 19,
+   "trips": 3358
+  },
+  {
+   "hour": 20,
+   "trips": 3479
+  },
+  {
+   "hour": 21,
+   "trips": 3512
+  },
+  {
+   "hour": 22,
+   "trips": 3044
+  },
+  {
+   "hour": 23,
+   "trips": 1600
+  }
+ ],
+ "heatmap": [
+  {
+   "dow": 0,
+   "hour": 0,
+   "count": 9
+  },
+  {
+   "dow": 0,
+   "hour": 1,
+   "count": 1
+  },
+  {
+   "dow": 0,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 0,
+   "hour": 9,
+   "count": 1
+  },
+  {
+   "dow": 0,
+   "hour": 10,
+   "count": 4
+  },
+  {
+   "dow": 0,
+   "hour": 11,
+   "count": 5
+  },
+  {
+   "dow": 0,
+   "hour": 12,
+   "count": 13
+  },
+  {
+   "dow": 0,
+   "hour": 13,
+   "count": 18
+  },
+  {
+   "dow": 0,
+   "hour": 14,
+   "count": 31
+  },
+  {
+   "dow": 0,
+   "hour": 15,
+   "count": 134
+  },
+  {
+   "dow": 0,
+   "hour": 16,
+   "count": 289
+  },
+  {
+   "dow": 0,
+   "hour": 17,
+   "count": 361
+  },
+  {
+   "dow": 0,
+   "hour": 18,
+   "count": 439
+  },
+  {
+   "dow": 0,
+   "hour": 19,
+   "count": 429
+  },
+  {
+   "dow": 0,
+   "hour": 20,
+   "count": 459
+  },
+  {
+   "dow": 0,
+   "hour": 21,
+   "count": 437
+  },
+  {
+   "dow": 0,
+   "hour": 22,
+   "count": 367
+  },
+  {
+   "dow": 0,
+   "hour": 23,
+   "count": 118
+  },
+  {
+   "dow": 1,
+   "hour": 0,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 1,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 1,
+   "hour": 10,
+   "count": 4
+  },
+  {
+   "dow": 1,
+   "hour": 11,
+   "count": 7
+  },
+  {
+   "dow": 1,
+   "hour": 12,
+   "count": 6
+  },
+  {
+   "dow": 1,
+   "hour": 13,
+   "count": 7
+  },
+  {
+   "dow": 1,
+   "hour": 14,
+   "count": 18
+  },
+  {
+   "dow": 1,
+   "hour": 15,
+   "count": 65
+  },
+  {
+   "dow": 1,
+   "hour": 16,
+   "count": 152
+  },
+  {
+   "dow": 1,
+   "hour": 17,
+   "count": 171
+  },
+  {
+   "dow": 1,
+   "hour": 18,
+   "count": 234
+  },
+  {
+   "dow": 1,
+   "hour": 19,
+   "count": 249
+  },
+  {
+   "dow": 1,
+   "hour": 20,
+   "count": 263
+  },
+  {
+   "dow": 1,
+   "hour": 21,
+   "count": 258
+  },
+  {
+   "dow": 1,
+   "hour": 22,
+   "count": 201
+  },
+  {
+   "dow": 1,
+   "hour": 23,
+   "count": 101
+  },
+  {
+   "dow": 2,
+   "hour": 0,
+   "count": 10
+  },
+  {
+   "dow": 2,
+   "hour": 1,
+   "count": 3
+  },
+  {
+   "dow": 2,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 10,
+   "count": 0
+  },
+  {
+   "dow": 2,
+   "hour": 11,
+   "count": 2
+  },
+  {
+   "dow": 2,
+   "hour": 12,
+   "count": 4
+  },
+  {
+   "dow": 2,
+   "hour": 13,
+   "count": 4
+  },
+  {
+   "dow": 2,
+   "hour": 14,
+   "count": 12
+  },
+  {
+   "dow": 2,
+   "hour": 15,
+   "count": 144
+  },
+  {
+   "dow": 2,
+   "hour": 16,
+   "count": 330
+  },
+  {
+   "dow": 2,
+   "hour": 17,
+   "count": 364
+  },
+  {
+   "dow": 2,
+   "hour": 18,
+   "count": 486
+  },
+  {
+   "dow": 2,
+   "hour": 19,
+   "count": 515
+  },
+  {
+   "dow": 2,
+   "hour": 20,
+   "count": 531
+  },
+  {
+   "dow": 2,
+   "hour": 21,
+   "count": 536
+  },
+  {
+   "dow": 2,
+   "hour": 22,
+   "count": 502
+  },
+  {
+   "dow": 2,
+   "hour": 23,
+   "count": 185
+  },
+  {
+   "dow": 3,
+   "hour": 0,
+   "count": 12
+  },
+  {
+   "dow": 3,
+   "hour": 1,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 10,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 11,
+   "count": 0
+  },
+  {
+   "dow": 3,
+   "hour": 12,
+   "count": 4
+  },
+  {
+   "dow": 3,
+   "hour": 13,
+   "count": 16
+  },
+  {
+   "dow": 3,
+   "hour": 14,
+   "count": 35
+  },
+  {
+   "dow": 3,
+   "hour": 15,
+   "count": 163
+  },
+  {
+   "dow": 3,
+   "hour": 16,
+   "count": 324
+  },
+  {
+   "dow": 3,
+   "hour": 17,
+   "count": 373
+  },
+  {
+   "dow": 3,
+   "hour": 18,
+   "count": 474
+  },
+  {
+   "dow": 3,
+   "hour": 19,
+   "count": 529
+  },
+  {
+   "dow": 3,
+   "hour": 20,
+   "count": 530
+  },
+  {
+   "dow": 3,
+   "hour": 21,
+   "count": 590
+  },
+  {
+   "dow": 3,
+   "hour": 22,
+   "count": 518
+  },
+  {
+   "dow": 3,
+   "hour": 23,
+   "count": 166
+  },
+  {
+   "dow": 4,
+   "hour": 0,
+   "count": 1
+  },
+  {
+   "dow": 4,
+   "hour": 1,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 10,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 11,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 12,
+   "count": 0
+  },
+  {
+   "dow": 4,
+   "hour": 13,
+   "count": 5
+  },
+  {
+   "dow": 4,
+   "hour": 14,
+   "count": 24
+  },
+  {
+   "dow": 4,
+   "hour": 15,
+   "count": 164
+  },
+  {
+   "dow": 4,
+   "hour": 16,
+   "count": 342
+  },
+  {
+   "dow": 4,
+   "hour": 17,
+   "count": 471
+  },
+  {
+   "dow": 4,
+   "hour": 18,
+   "count": 505
+  },
+  {
+   "dow": 4,
+   "hour": 19,
+   "count": 548
+  },
+  {
+   "dow": 4,
+   "hour": 20,
+   "count": 592
+  },
+  {
+   "dow": 4,
+   "hour": 21,
+   "count": 600
+  },
+  {
+   "dow": 4,
+   "hour": 22,
+   "count": 569
+  },
+  {
+   "dow": 4,
+   "hour": 23,
+   "count": 432
+  },
+  {
+   "dow": 5,
+   "hour": 0,
+   "count": 102
+  },
+  {
+   "dow": 5,
+   "hour": 1,
+   "count": 1
+  },
+  {
+   "dow": 5,
+   "hour": 2,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 10,
+   "count": 0
+  },
+  {
+   "dow": 5,
+   "hour": 11,
+   "count": 3
+  },
+  {
+   "dow": 5,
+   "hour": 12,
+   "count": 4
+  },
+  {
+   "dow": 5,
+   "hour": 13,
+   "count": 23
+  },
+  {
+   "dow": 5,
+   "hour": 14,
+   "count": 62
+  },
+  {
+   "dow": 5,
+   "hour": 15,
+   "count": 193
+  },
+  {
+   "dow": 5,
+   "hour": 16,
+   "count": 415
+  },
+  {
+   "dow": 5,
+   "hour": 17,
+   "count": 509
+  },
+  {
+   "dow": 5,
+   "hour": 18,
+   "count": 536
+  },
+  {
+   "dow": 5,
+   "hour": 19,
+   "count": 565
+  },
+  {
+   "dow": 5,
+   "hour": 20,
+   "count": 604
+  },
+  {
+   "dow": 5,
+   "hour": 21,
+   "count": 605
+  },
+  {
+   "dow": 5,
+   "hour": 22,
+   "count": 598
+  },
+  {
+   "dow": 5,
+   "hour": 23,
+   "count": 507
+  },
+  {
+   "dow": 6,
+   "hour": 0,
+   "count": 180
+  },
+  {
+   "dow": 6,
+   "hour": 1,
+   "count": 14
+  },
+  {
+   "dow": 6,
+   "hour": 2,
+   "count": 1
+  },
+  {
+   "dow": 6,
+   "hour": 3,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 4,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 5,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 6,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 7,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 8,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 9,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 10,
+   "count": 0
+  },
+  {
+   "dow": 6,
+   "hour": 11,
+   "count": 1
+  },
+  {
+   "dow": 6,
+   "hour": 12,
+   "count": 2
+  },
+  {
+   "dow": 6,
+   "hour": 13,
+   "count": 8
+  },
+  {
+   "dow": 6,
+   "hour": 14,
+   "count": 34
+  },
+  {
+   "dow": 6,
+   "hour": 15,
+   "count": 121
+  },
+  {
+   "dow": 6,
+   "hour": 16,
+   "count": 332
+  },
+  {
+   "dow": 6,
+   "hour": 17,
+   "count": 453
+  },
+  {
+   "dow": 6,
+   "hour": 18,
+   "count": 516
+  },
+  {
+   "dow": 6,
+   "hour": 19,
+   "count": 523
+  },
+  {
+   "dow": 6,
+   "hour": 20,
+   "count": 500
+  },
+  {
+   "dow": 6,
+   "hour": 21,
+   "count": 486
+  },
+  {
+   "dow": 6,
+   "hour": 22,
+   "count": 289
+  },
+  {
+   "dow": 6,
+   "hour": 23,
+   "count": 91
+  }
+ ],
+ "surge": [
+  {
+   "tier": "No surge",
+   "trips": 17615,
+   "avg_fare": 14.67
+  },
+  {
+   "tier": "1.0\u20131.5\u00d7",
+   "trips": 4533,
+   "avg_fare": 16.51
+  },
+  {
+   "tier": "1.5\u20132.0\u00d7",
+   "trips": 1545,
+   "avg_fare": 20.88
+  },
+  {
+   "tier": "2.0\u20133.0\u00d7",
+   "trips": 803,
+   "avg_fare": 25.24
+  },
+  {
+   "tier": "3.0\u00d7+",
+   "trips": 248,
+   "avg_fare": 32.19
+  }
+ ],
+ "airport": {
+  "airport_trips": 139,
+  "airport_avg_fare": 42.69,
+  "city_trips": 24605,
+  "city_avg_fare": 15.76
+ },
+ "take_rate": [
+  {
+   "year": 2023,
+   "rate": 40.2
+  },
+  {
+   "year": 2024,
+   "rate": 39.3
+  },
+  {
+   "year": 2025,
+   "rate": 39.9
+  },
+  {
+   "year": 2026,
+   "rate": 44.0
+  }
+ ],
+ "tips_total": 35911.2,
+ "tip_rate": 39.1
+}

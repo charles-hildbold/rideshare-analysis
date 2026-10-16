@@ -1,8 +1,8 @@
 # Rideshare Analysis
 
 I've driven for Uber and Lyft since 2018. Somewhere along the way I realized
-I was sitting on a pretty detailed record of my own work — every trip, every
-payment, every mile — and nobody had ever actually sat down and worked out
+I was sitting on a pretty detailed record of my own work, every trip, every
+payment, every mile, and nobody had ever actually sat down and worked out
 what the job pays once you account for all of it.
 
 So I pulled my data and did it myself.
@@ -15,28 +15,32 @@ and May 2026:
 - 25,549 completed trips
 - 7,876 hours clocked
 - 158,940 miles driven
-- Data pulled from four sources: Uber's trip and payment exports, Lyft's
-  ride and session exports, and Gridwise (which tracks total time on the
-  clock, including the unpaid waiting and driving-to-pickup that the apps
-  leave out)
+- Data pulled from Uber's trip and payment exports, Lyft's ride, session
+  and payout exports, and Gridwise, which tracks total time on the clock,
+  including the unpaid waiting and driving to pickups that the apps leave
+  out
 
 The four sources didn't agree with each other. Getting them to tell one
 consistent story was most of the work.
 
 ## A few things I found
 
-- My real hourly rate is about $41.61 — less than half the "$95/hour" the
+- My real hourly rate is $41.61, less than half the roughly $95 an hour the
   Uber app implies, because the app only counts time with a passenger in
   the car.
-- Uber's cut of each fare has roughly doubled since I started, from about
-  17% to 44%. My hourly pay stayed flat anyway, which means I've had to get
-  more efficient just to break even with where I was.
+- Saturday paid $53.24 an hour and Monday paid $33.11. When I drive matters
+  more than how much.
+- Uber's cut held near 40% from 2023 through 2025 and rose to 44% in 2026.
+  My hourly rate held steady through it.
 - Airport trips pay about 2.7x a normal trip, and I almost never take them.
 
 ## How it was built
 
-Python and Pandas for all the data work, Matplotlib and Chart.js for the
-charts. The write-up is a single self-contained HTML page.
+Python and pandas for all the data work. The summary numbers behind every
+chart are in `data/summary.json`, and `build.py` turns them into `index.html`
+(charts are drawn as inline SVG straight from that file). To rebuild:
+
+    python3 build.py
 
 ## See it live
 

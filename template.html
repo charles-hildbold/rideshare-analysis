@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>What rideshare really pays</title>
+<meta name="description" content="A case study by Charlie Hildbold. 25,549 trips and 158,940 miles of my own Uber, Lyft and Gridwise data, reconciled to find the real hourly pay." />
+<meta property="og:title" content="What rideshare really pays" />
+<meta property="og:description" content="The app says about $95 an hour. Reconciled across 25,549 trips and 7,876 hours, the real number is $41.61." />
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+  @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+  @font-face { font-family: "Source Serif 4"; src: url("fonts/source-serif-4.woff2") format("woff2"); font-weight: 200 900; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Source Serif 4"; src: url("fonts/source-serif-4-italic.woff2") format("woff2"); font-weight: 200 900; font-style: italic; font-display: swap; }
+
+  :root {
+    --paper: #F2F3F1;
+    --ink: #1E2638;
+    --ink-2: #4A5266;
+    --rule: #D5D8D2;
+    --bar: #3D5A99;
+    --red: #A8262F;
+    --sans: "Archivo", "Arial Narrow", Arial, sans-serif;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 19px; line-height: 1.7; }
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--red); }
+  a:focus-visible, .hit:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+  .col { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  .wide { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  .top { display: flex; justify-content: space-between; gap: 16px; padding-top: 22px; padding-bottom: 22px; font-family: var(--sans); font-size: 15px; }
+  .top a { text-decoration: none; }
+  .top .mark { font-weight: 700; font-stretch: 85%; font-size: 17px; }
+  .top .back { color: var(--ink-2); }
+
+  h1, h2, h3 { font-family: var(--sans); line-height: 1.05; margin: 0; }
+  h1 { font-size: clamp(52px, 9vw, 104px); font-weight: 800; font-stretch: 68%; text-transform: uppercase; letter-spacing: -0.005em; line-height: 0.9; }
+  .dek { font-size: 24px; line-height: 1.45; margin: 28px 0 0; }
+  .byline { font-family: var(--sans); font-size: 15px; color: var(--ink-2); margin-top: 18px; }
+
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 32px; margin: 40px 0 0; padding: 22px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); font-family: var(--sans); }
+  .facts div { margin: 0; }
+  .facts dt { font-size: 14px; color: var(--ink-2); }
+  .facts dd { margin: 2px 0 0; font-size: 24px; font-weight: 700; font-stretch: 78%; font-variant-numeric: tabular-nums; }
+
+  section.col { margin-top: 72px; }
+  h2 { font-size: 38px; font-weight: 700; font-stretch: 78%; margin-bottom: 18px; }
+  p { margin: 0 0 20px; }
+
+  /* The one big comparison */
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; margin: 36px 0 28px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; font-family: var(--sans); }
+  .verdict > div { padding: 22px 24px 20px; }
+  .verdict > div + div { border-left: 2px solid var(--ink); background: #fff; }
+  .verdict .n { font-size: clamp(56px, 9vw, 92px); font-weight: 800; font-stretch: 70%; line-height: 1; font-variant-numeric: tabular-nums; }
+  .verdict .n small { font-size: 0.4em; font-weight: 700; }
+  .verdict .app .n { color: var(--ink-2); text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--red); }
+  .verdict .l { font-size: 16px; margin-top: 10px; line-height: 1.4; }
+
+  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 28px 0 0; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0 0 22px 52px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); font-family: var(--sans); font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+  ol.steps b { font-family: var(--sans); font-weight: 700; display: block; font-size: 19px; }
+
+  figure { margin: 32px 0 36px; }
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart .ax { font-family: var(--sans); font-size: 13px; fill: var(--ink-2); }
+  .chart .dl { font-family: var(--sans); font-size: 14px; font-weight: 700; fill: var(--ink); }
+  figcaption { font-family: var(--sans); font-size: 15px; color: var(--ink-2); margin-top: 10px; line-height: 1.45; }
+  figcaption b { color: var(--ink); }
+  .fig-title { font-family: var(--sans); font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+
+  .table-wrap { overflow-x: auto; margin: 28px 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 16px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  thead th { font-weight: 700; color: var(--ink-2); font-size: 14px; border-bottom: 2px solid var(--ink); vertical-align: bottom; white-space: normal; }
+  tbody th { text-align: left; font-weight: 700; }
+  thead th:first-child { text-align: left; }
+  tr.tot th, tr.tot td { border-top: 2px solid var(--ink); border-bottom: 0; font-weight: 700; }
+
+  .heat { display: grid; grid-template-columns: 40px repeat(24, minmax(0, 1fr)); gap: 2px; font-family: var(--sans); font-size: 12px; color: var(--ink-2); }
+  .heat .hh { text-align: left; padding-bottom: 2px; }
+  .heat .hd { display: flex; align-items: center; }
+  .heat .hc { aspect-ratio: 1 / 1.15; border-radius: 2px; outline: 1px solid rgba(30, 38, 56, 0.06); outline-offset: -1px; }
+  .scale { display: flex; align-items: center; gap: 10px; font-family: var(--sans); font-size: 14px; color: var(--ink-2); margin-top: 12px; }
+  .scale i { display: block; width: 160px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, rgba(61, 90, 153, 0.08), rgba(61, 90, 153, 1)); }
+
+  .findings { margin-top: 8px; }
+  .findings > div { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 0 24px; padding: 22px 0; border-top: 1px solid var(--rule); }
+  .findings > div:first-child { border-top: 0; }
+  .findings .big { grid-row: span 2; }
+  .findings h3 { font-size: 22px; font-stretch: 82%; margin-bottom: 8px; }
+  .findings .big { font-family: var(--sans); font-size: 34px; font-weight: 800; font-stretch: 72%; line-height: 1; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .findings p { font-size: 17px; line-height: 1.6; }
+
+  .notes { font-size: 17px; }
+  .notes h3 { font-size: 20px; font-stretch: 85%; margin: 26px 0 8px; }
+  .notes ul { padding-left: 20px; margin: 0 0 12px; }
+  .end { margin: 64px 0 0; padding: 32px 0 48px; border-top: 2px solid var(--ink); font-family: var(--sans); }
+  .end p { font-family: var(--serif); }
+  .end ul { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 18px; }
+
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: #fff; font-family: var(--sans); font-size: 14px; line-height: 1.35; padding: 7px 10px; border-radius: 4px; max-width: 280px; opacity: 0; }
+  #tip.on { opacity: 1; }
+
+  @media (max-width: 760px) {
+    body { font-size: 18px; }
+    .col, .wide { padding: 0 16px; }
+    .dek { font-size: 21px; }
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .verdict { grid-template-columns: 1fr; }
+    .verdict > div + div { border-left: 0; border-top: 2px solid var(--ink); }
+    .findings > div { grid-template-columns: 1fr; }
+    .findings .big { grid-row: auto; }
+    h2 { font-size: 32px; }
+    .heat { grid-template-columns: 30px repeat(24, minmax(0, 1fr)); gap: 1px; font-size: 10px; }
+    .chart .ax { font-size: 15px; }
+    .chart .dl { font-size: 16px; }
+  }
+  @media print { #tip { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="wide top">
+  <a class="mark" href="https://charleshildbold.com">Charlie Hildbold</a>
+  <a class="back" href="https://charleshildbold.com/#work">More of my work</a>
+</header>
+
+<main>
+  <div class="col">
+    <h1>What rideshare really pays</h1>
+    <p class="dek">I reconciled three and a half years of my own driving data to answer one question: per hour of my time, what does this job actually pay? The app makes it look like about $95. The real number is {{RATE}}.</p>
+    <div class="byline">A case study by Charlie Hildbold. Data from January 1, 2023 to May 9, 2026.</div>
+
+    <dl class="facts">
+      <div><dt>Trips</dt><dd>{{TRIPS}}</dd></div>
+      <div><dt>Hours on the clock</dt><dd>{{HOURS}}</dd></div>
+      <div><dt>Miles</dt><dd>{{MILES}}</dd></div>
+      <div><dt>Net earnings</dt><dd>{{EARN}}</dd></div>
+      <div><dt>Days driven</dt><dd>{{DAYS}}</dd></div>
+      <div><dt>Raw data</dt><dd>415,000+ rows</dd></div>
+    </dl>
+  </div>
+
+  <section class="col">
+    <h2>The app's number leaves out half the job</h2>
+    <p>Uber shows drivers what they earned while a rider was in the car. That skips the drive to the pickup, the wait in the airport lot, the empty drive home from a long trip, and the dead time between requests. All of that is still work, and none of it is paid.</p>
+    <p>I ran Gridwise the whole time, which logs every hour I was on the clock. Divide what I actually netted by those hours and the picture changes.</p>
+
+    <div class="verdict">
+      <div class="app"><div class="n">$95<small>/hr</small></div><div class="l">What Uber's on-trip numbers imply. Gross fares, only the minutes a rider was in the car.</div></div>
+      <div class="real"><div class="n">{{RATE}}<small>/hr</small></div><div class="l">What I netted after platform fees, across all {{HOURS}} hours on the clock.</div></div>
+    </div>
+    <p>The app's number is about {{OVERSTATE}} times too high. That's not a lie, it's measuring the wrong thing. If you only ever look at the app, you'll badly overestimate what an hour of this work is worth.</p>
+  </section>
+
+  <section class="col">
+    <h2>Getting four sources to agree</h2>
+    <p>No single export told the whole story, and they didn't agree with each other. Most of the work was making them line up.</p>
+    <ol class="steps">
+      <li><b>Pull everything</b>Uber's trip history (46,548 rows) and payment ledger (368,869 line items), Lyft's rides, sessions and payouts, and Gridwise's daily earnings, hours and mileage. Six files, 415,000+ rows.</li>
+      <li><b>Reconcile the ledgers</b>Gridwise's earnings totals matched Uber's payment ledger to within $1,000 over three years. The biggest single gap came down to one day.</li>
+      <li><b>Explain the outliers</b>My best day on paper was February 28, 2024: {{TOP_DAY}} on four rides. It turned out to be a {{SETTLE}} EV settlement Uber paid outside its normal earnings records. It's real money, so it stays in the totals, and it's flagged on every chart.</li>
+      <li><b>Use the right unit</b>Everything is per hour on the clock, per mile and per trip, net of platform fees. Not per hour with a rider in the car.</li>
+    </ol>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Year</th><th scope="col">Days</th><th scope="col">Trips</th><th scope="col">Net earnings</th><th scope="col">Hours</th><th scope="col">Miles</th><th scope="col">Per hour</th><th scope="col">IRS mileage deduction</th></tr></thead>
+        <tbody>{{ANNUAL_ROWS}}</tbody>
+      </table>
+    </div>
+    <p class="notes" style="color:var(--ink-2);font-family:var(--sans);font-size:15px">The deduction column is miles driven times the IRS standard mileage rate for that year. Other per-unit numbers for the whole period: {{PER_MILE}} per mile, {{PER_TRIP}} per trip, {{RIDES_HR}} rides per hour, {{SPEED}} mph average.</p>
+  </section>
+
+  <section class="col">
+    <h2>Steady, month after month</h2>
+    <p>Outside the settlement month, every full month landed between about {{MONTH_LOW}} and {{MONTH_HIGH}}. The hourly rate barely moved year to year: $42.04, $42.87, $40.10, and $41.46 so far in 2026. The job is consistent. The question is how to make it pay more.</p>
+    <figure>
+      <div class="fig-title">Net earnings by month</div>
+      {{MONTHLY_SVG}}
+      <figcaption>January 2023 to May 2026. <b>Red:</b> February 2024, which includes the $1,868 EV settlement. The last bar is May 1 to 9 only.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>When I drive matters more than how much</h2>
+    <p>Saturday paid {{SAT_HR}} an hour. Monday paid {{MON_HR}}. Same car, same driver, same city, and {{SAT_VS_MON}}% more for every hour. Per day the gap is just as wide: {{SAT_DAY}} on an average Saturday against {{TUE_DAY}} on a Tuesday. It's the biggest lever in the whole dataset.</p>
+    <figure>
+      <div class="fig-title">Net earnings per hour on the clock, by day</div>
+      {{DOW_SVG}}
+      <figcaption>All {{DAYS}} days driven. Hover any bar for days driven and the per-day average.</figcaption>
+    </figure>
+    <p>The hours tell the same story. {{EVENING_PCT}}% of my Uber trips started between 3 PM and midnight, heaviest on Friday and Saturday nights. Mornings are basically empty. That's my schedule, not the market's, so it says as much about how I work as where the demand is.</p>
+    <figure>
+      <div class="fig-title">Completed Uber trips by hour and day</div>
+      {{HEATMAP}}
+      <div class="scale"><span>Fewer trips</span><i></i><span>More trips</span></div>
+      <figcaption>24,744 Uber trips with a recorded start time. Hover a cell for the count.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Uber's cut went up in 2026</h2>
+    <p>From Uber's per-line-item payment ledger, I divided Uber's total commission by everything riders paid. For three years it held right around 40%. In 2026 so far it's {{TR_LAST}}. My hourly rate held steady through it, which means I'm working smarter to stay even, not getting ahead.</p>
+    <figure>
+      <div class="fig-title">Share of rider payments Uber kept</div>
+      {{TAKE_SVG}}
+      <figcaption>Commission divided by total rider payments, from 368,869 Uber payment line items. 2026 runs through May 9.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Surge is a bonus, not a plan</h2>
+    <p>{{NO_SURGE_PCT}}% of my Uber trips had no surge at all, and those base-price trips are the backbone of the income. Surge pays well when it shows up. The {{TOP_SURGE_TRIPS}} trips at 3x or higher averaged {{TOP_SURGE_FARE}}, about {{SURGE_MULT}} times a normal {{NO_SURGE_FARE}} fare. But it's rare, and chasing it means driving empty to get there.</p>
+    <figure>
+      <div class="fig-title">Average fare by surge level</div>
+      {{SURGE_SVG}}
+      <figcaption>24,744 Uber trips with surge data. Hover a bar for the trip count.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Three smaller findings</h2>
+    <div class="findings">
+      <div>
+        <div class="big">{{AP_PREMIUM}}x</div>
+        <h3>Airport runs pay, and I skip them</h3>
+        <p>Pittsburgh International trips averaged {{AP_FARE}} against {{CITY_FARE}} for a city trip. Only {{AP_TRIPS}} of my trips were airport runs, {{AP_SHARE}}%. Doubling that would add roughly {{AP_EXTRA}} a year, before counting the longer drive and the empty trip back.</p>
+      </div>
+      <div>
+        <div class="big">{{TIP_RATE}}%</div>
+        <h3>Riders tip when the ride is good</h3>
+        <p>Riders tipped on {{TIP_RATE}}% of my trips, {{TIPS}} in total. That's money that only shows up when the ride goes right.</p>
+      </div>
+      <div>
+        <div class="big">{{UBER_SHARE}}%</div>
+        <h3>Nearly all Uber</h3>
+        <p>{{UBER_SHARE}}% of my trips were Uber. Lyft paid almost the same per trip, {{LYFT_TRIP}} against {{UBER_TRIP}}, across {{LYFT_TRIPS}} rides. It's a real backup option I've barely used.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="col notes">
+    <h2>Why I did this</h2>
+    <p>Most portfolio projects start with a clean dataset somebody else prepared. This one started with six files that disagreed, an outlier day that looked like an error, and a headline number that was technically true and still wrong. Sorting that out is most of what analytics work is in a front office or anywhere else: find the right source, reconcile what doesn't match, pick the unit that answers the real question, and explain it so someone can act on it.</p>
+
+    <h3>About the data</h3>
+    <ul>
+      <li>Sources: Uber driver_lifetime_trips (46,548 rows), Uber driver_payments (368,869 line items), Lyft rides, sessions and payments, and Gridwise daily earnings and mileage.</li>
+      <li>Period: January 1, 2023 to May 9, 2026. {{DAYS}} days driven, {{HOURS}} hours, {{MILES}} miles.</li>
+      <li>All earnings are net of platform fees. Headline figures are totals from the exports, not estimates.</li>
+      <li>Built with Python and pandas. The summary numbers behind every chart are in <a href="https://github.com/charles-hildbold/rideshare-analysis/blob/main/data/summary.json">data/summary.json</a>, and <a href="https://github.com/charles-hildbold/rideshare-analysis/blob/main/build.py">build.py</a> turns them into this page. The raw exports stay private because they're my personal financial records.</li>
+    </ul>
+  </section>
+
+  <div class="col">
+    <div class="end">
+      <h2>Want to talk about it?</h2>
+      <p>I'm looking for a front office or analytics role in the Pittsburgh area. I spent 15 years running minor league sports businesses before I went back for my master's in data analytics.</p>
+      <ul>
+        <li><a href="mailto:charles.hildbold@gmail.com">charles.hildbold@gmail.com</a></li>
+        <li><a href="https://charleshildbold.com">charleshildbold.com</a></li>
+        <li><a href="https://www.linkedin.com/in/charleshildbold">LinkedIn</a></li>
+        <li><a href="https://github.com/charles-hildbold/rideshare-analysis">This project on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<div id="tip" role="status" aria-live="polite"></div>
+<script>
+  (function () {
+    var tip = document.getElementById('tip');
+    function show(el, x, y) {
+      tip.textContent = el.getAttribute('data-tip');
+      tip.classList.add('on');
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      var left = Math.min(Math.max(8, x - w / 2), window.innerWidth - w - 8);
+      var top = y - h - 14;
+      if (top < 8) top = y + 18;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+    function hide() { tip.classList.remove('on'); }
+    document.querySelectorAll('.hit').forEach(function (el) {
+      el.setAttribute('tabindex', '0');
+      el.addEventListener('mousemove', function (e) { show(el, e.clientX, e.clientY); });
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('focus', function () { var r = el.getBoundingClientRect(); show(el, r.left + r.width / 2, r.top); });
+      el.addEventListener('blur', hide);
+      el.addEventListener('touchstart', function (e) { var t = e.touches[0]; show(el, t.clientX, t.clientY); }, { passive: true });
+    });
+    window.addEventListener('scroll', hide, { passive: true });
+  })();
+</script>
+</body>
+</html>

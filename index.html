@@ -1,1104 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Numbers Behind the Wheel · A Data Case Study</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>What rideshare really pays</title>
+<meta name="description" content="A case study by Charlie Hildbold. 25,549 trips and 158,940 miles of my own Uber, Lyft and Gridwise data, reconciled to find the real hourly pay." />
+<meta property="og:title" content="What rideshare really pays" />
+<meta property="og:description" content="The app says about $95 an hour. Reconciled across 25,549 trips and 7,876 hours, the real number is $41.61." />
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
 <style>
-:root {
-  --ink: #1a1814;
-  --paper: #f7f3ec;
-  --paper-2: #efe9de;
-  --accent: #c1440e;
-  --accent-2: #d97757;
-  --gold: #b8860b;
-  --green: #3d6b35;
-  --muted: #6b6258;
-  --rule: #1a1814;
-  --rule-light: #c8c0b3;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Fraunces', Georgia, serif;
-  background: var(--paper);
-  color: var(--ink);
-  line-height: 1.5;
-  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
-}
-.container { max-width: 980px; margin: 0 auto; padding: 0 2rem; }
-.container-wide { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+  @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+  @font-face { font-family: "Source Serif 4"; src: url("fonts/source-serif-4.woff2") format("woff2"); font-weight: 200 900; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Source Serif 4"; src: url("fonts/source-serif-4-italic.woff2") format("woff2"); font-weight: 200 900; font-style: italic; font-display: swap; }
 
-/* MASTHEAD */
-.masthead {
-  border-bottom: 1px solid var(--ink);
-  padding: 1.2rem 0;
-  background: var(--paper);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(6px);
-  background: rgba(247, 243, 236, 0.92);
-}
-.masthead-inner {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-family: 'Fraunces', serif;
-}
-.masthead-title {
-  font-weight: 900;
-  font-size: 1.3rem;
-  font-style: italic;
-  letter-spacing: -0.02em;
-}
-.masthead-meta {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--muted);
-}
+  :root {
+    --paper: #F2F3F1;
+    --ink: #1E2638;
+    --ink-2: #4A5266;
+    --rule: #D5D8D2;
+    --bar: #3D5A99;
+    --red: #A8262F;
+    --sans: "Archivo", "Arial Narrow", Arial, sans-serif;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 19px; line-height: 1.7; }
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--red); }
+  a:focus-visible, .hit:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
 
-/* HERO */
-.hero {
-  padding: 6rem 0 4rem;
-  border-bottom: 3px double var(--ink);
-}
-.hero-kicker {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: var(--accent);
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.hero-kicker::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--accent);
-  opacity: 0.4;
-}
-.hero h1 {
-  font-family: 'Fraunces', serif;
-  font-weight: 900;
-  font-size: clamp(2.8rem, 7vw, 5.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  margin-bottom: 2rem;
-  font-style: italic;
-}
-.hero h1 .accent {
-  color: var(--accent);
-  font-style: normal;
-}
-.hero-deck {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
-  line-height: 1.4;
-  max-width: 38em;
-  color: var(--ink);
-  margin-bottom: 3rem;
-}
-.hero-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 2rem;
-  padding-top: 2.5rem;
-  border-top: 1px solid var(--rule-light);
-}
-.hero-meta-item-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--muted);
-  margin-bottom: 0.4rem;
-}
-.hero-meta-item-value {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 1.05rem;
-}
+  .col { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  .wide { max-width: 980px; margin: 0 auto; padding: 0 24px; }
 
-/* SECTION */
-.section {
-  padding: 5rem 0;
-  border-bottom: 1px solid var(--rule-light);
-}
-.section-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.section-num::before {
-  content: '§';
-  font-family: 'Fraunces', serif;
-  font-size: 1.3rem;
-  font-style: italic;
-  color: var(--accent);
-}
-.section h2 {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
-  margin-bottom: 2rem;
-  max-width: 22em;
-}
-.section h2 em {
-  font-style: italic;
-  color: var(--accent);
-  font-weight: 700;
-}
-.section h3 {
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  font-size: 1.5rem;
-  margin: 2.5rem 0 1rem;
-  letter-spacing: -0.015em;
-}
-.section p {
-  font-size: 1.12rem;
-  line-height: 1.7;
-  max-width: 36em;
-  margin-bottom: 1.3rem;
-  color: var(--ink);
-}
-.section p.lede {
-  font-family: 'Fraunces', serif;
-  font-size: 1.35rem;
-  font-weight: 400;
-  line-height: 1.5;
-  margin-bottom: 2.5rem;
-  color: var(--ink);
-}
-.section p.lede::first-letter {
-  font-family: 'Fraunces', serif;
-  font-weight: 900;
-  font-size: 4.5em;
-  float: left;
-  line-height: 0.85;
-  padding-right: 0.08em;
-  margin-top: 0.05em;
-  color: var(--accent);
-}
+  .top { display: flex; justify-content: space-between; gap: 16px; padding-top: 22px; padding-bottom: 22px; font-family: var(--sans); font-size: 15px; }
+  .top a { text-decoration: none; }
+  .top .mark { font-weight: 700; font-stretch: 85%; font-size: 17px; }
+  .top .back { color: var(--ink-2); }
 
-/* HEADLINE STATS */
-.bigstat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0;
-  margin: 3rem 0;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-}
-.bigstat {
-  padding: 2rem 1.5rem;
-  border-right: 1px solid var(--rule-light);
-}
-.bigstat:last-child { border-right: none; }
-.bigstat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  margin-bottom: 0.6rem;
-}
-.bigstat-value {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: 2.4rem;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-}
-.bigstat-value.accent { color: var(--accent); }
-.bigstat-detail {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
+  h1, h2, h3 { font-family: var(--sans); line-height: 1.05; margin: 0; }
+  h1 { font-size: clamp(52px, 9vw, 104px); font-weight: 800; font-stretch: 68%; text-transform: uppercase; letter-spacing: -0.005em; line-height: 0.9; }
+  .dek { font-size: 24px; line-height: 1.45; margin: 28px 0 0; }
+  .byline { font-family: var(--sans); font-size: 15px; color: var(--ink-2); margin-top: 18px; }
 
-/* PULL QUOTE */
-.pull {
-  border-left: 4px solid var(--accent);
-  padding: 1.5rem 0 1.5rem 2rem;
-  margin: 3rem 0;
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-style: italic;
-  font-size: 1.6rem;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
-  max-width: 32em;
-}
-.pull-attrib {
-  font-family: 'JetBrains Mono', monospace;
-  font-style: normal;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  margin-top: 1rem;
-  font-weight: 500;
-}
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 32px; margin: 40px 0 0; padding: 22px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); font-family: var(--sans); }
+  .facts div { margin: 0; }
+  .facts dt { font-size: 14px; color: var(--ink-2); }
+  .facts dd { margin: 2px 0 0; font-size: 24px; font-weight: 700; font-stretch: 78%; font-variant-numeric: tabular-nums; }
 
-/* CHART */
-.chart-wrap {
-  background: var(--paper-2);
-  padding: 2rem;
-  margin: 3rem 0;
-  border: 1px solid var(--rule-light);
-  position: relative;
-}
-.chart-wrap.full { margin: 3rem -3rem; padding: 3rem; }
-.chart-title {
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  font-size: 1.25rem;
-  margin-bottom: 0.4rem;
-  letter-spacing: -0.01em;
-}
-.chart-subtitle {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
-  max-width: 40em;
-}
-.chart-canvas {
-  position: relative;
-  height: 380px;
-}
-.chart-note {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--rule-light);
-}
+  section.col { margin-top: 72px; }
+  h2 { font-size: 38px; font-weight: 700; font-stretch: 78%; margin-bottom: 18px; }
+  p { margin: 0 0 20px; }
 
-/* TABLE */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 2rem 0 3rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-}
-.data-table thead {
-  border-top: 1.5px solid var(--ink);
-  border-bottom: 1.5px solid var(--ink);
-}
-.data-table th {
-  text-align: left;
-  padding: 0.8rem 1rem 0.8rem 0;
-  font-weight: 700;
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.data-table th.num, .data-table td.num { text-align: right; padding-left: 0; padding-right: 1rem; }
-.data-table td {
-  padding: 0.9rem 1rem 0.9rem 0;
-  border-bottom: 1px solid var(--rule-light);
-  font-variant-numeric: tabular-nums;
-}
-.data-table tbody tr:last-child td { border-bottom: 1.5px solid var(--ink); }
-.data-table .year-label {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-style: italic;
-  font-size: 1.05rem;
-}
+  /* The one big comparison */
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; margin: 36px 0 28px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; font-family: var(--sans); }
+  .verdict > div { padding: 22px 24px 20px; }
+  .verdict > div + div { border-left: 2px solid var(--ink); background: #fff; }
+  .verdict .n { font-size: clamp(56px, 9vw, 92px); font-weight: 800; font-stretch: 70%; line-height: 1; font-variant-numeric: tabular-nums; }
+  .verdict .n small { font-size: 0.4em; font-weight: 700; }
+  .verdict .app .n { color: var(--ink-2); text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--red); }
+  .verdict .l { font-size: 16px; margin-top: 10px; line-height: 1.4; }
 
-/* HEATMAP */
-.heatmap-wrap { margin: 3rem 0; }
-.heatmap { display: grid; grid-template-columns: 50px repeat(24, 1fr); gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; }
-.heatmap-label { display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: var(--muted); }
-.heatmap-label.col { justify-content: center; padding-right: 0; }
-.heatmap-cell { aspect-ratio: 1; min-height: 28px; }
-.heatmap-legend { display: flex; align-items: center; gap: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-top: 1rem; }
-.heatmap-legend-gradient { width: 200px; height: 12px; background: linear-gradient(90deg, var(--paper-2), var(--accent)); }
+  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 28px 0 0; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0 0 22px 52px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); font-family: var(--sans); font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+  ol.steps b { font-family: var(--sans); font-weight: 700; display: block; font-size: 19px; }
 
-/* METHOD */
-.method-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin: 2.5rem 0;
-}
-.method-card {
-  padding: 1.5rem;
-  background: var(--paper-2);
-  border-top: 3px solid var(--accent);
-}
-.method-card-num {
-  font-family: 'Fraunces', serif;
-  font-weight: 900;
-  font-style: italic;
-  font-size: 2rem;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-.method-card h4 {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-.method-card p {
-  font-family: 'Fraunces', serif;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: var(--ink);
-  margin: 0;
-}
+  figure { margin: 32px 0 36px; }
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart .ax { font-family: var(--sans); font-size: 13px; fill: var(--ink-2); }
+  .chart .dl { font-family: var(--sans); font-size: 14px; font-weight: 700; fill: var(--ink); }
+  figcaption { font-family: var(--sans); font-size: 15px; color: var(--ink-2); margin-top: 10px; line-height: 1.45; }
+  figcaption b { color: var(--ink); }
+  .fig-title { font-family: var(--sans); font-weight: 700; font-size: 18px; margin-bottom: 8px; }
 
-/* STACK */
-.stack {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin: 3rem 0;
-  border: 1px solid var(--rule-light);
-}
-.stack > div { padding: 2rem; }
-.stack > div:first-child { border-right: 1px solid var(--rule-light); }
-.stack-head {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  margin-bottom: 1rem;
-}
-.stack-value {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: 2.5rem;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  margin-bottom: 0.5rem;
-}
-.stack-context { font-family: 'Fraunces', serif; font-size: 0.95rem; color: var(--muted); font-style: italic; }
+  .table-wrap { overflow-x: auto; margin: 28px 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 16px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  thead th { font-weight: 700; color: var(--ink-2); font-size: 14px; border-bottom: 2px solid var(--ink); vertical-align: bottom; white-space: normal; }
+  tbody th { text-align: left; font-weight: 700; }
+  thead th:first-child { text-align: left; }
+  tr.tot th, tr.tot td { border-top: 2px solid var(--ink); border-bottom: 0; font-weight: 700; }
 
-/* COLOPHON */
-.colophon {
-  padding: 4rem 0 5rem;
-  background: var(--ink);
-  color: var(--paper);
-}
-.colophon h2 { color: var(--paper); }
-.colophon p { color: var(--paper); opacity: 0.85; }
-.colophon a { color: var(--accent-2); text-decoration: none; border-bottom: 1px solid var(--accent-2); }
-.colophon-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 2rem;
-  margin-top: 2.5rem;
-  padding-top: 2.5rem;
-  border-top: 1px solid rgba(247, 243, 236, 0.2);
-}
-.colophon-grid h5 {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--accent-2);
-  margin-bottom: 0.8rem;
-}
-.colophon-grid p { font-size: 0.95rem; line-height: 1.6; }
+  .heat { display: grid; grid-template-columns: 40px repeat(24, minmax(0, 1fr)); gap: 2px; font-family: var(--sans); font-size: 12px; color: var(--ink-2); }
+  .heat .hh { text-align: left; padding-bottom: 2px; }
+  .heat .hd { display: flex; align-items: center; }
+  .heat .hc { aspect-ratio: 1 / 1.15; border-radius: 2px; outline: 1px solid rgba(30, 38, 56, 0.06); outline-offset: -1px; }
+  .scale { display: flex; align-items: center; gap: 10px; font-family: var(--sans); font-size: 14px; color: var(--ink-2); margin-top: 12px; }
+  .scale i { display: block; width: 160px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, rgba(61, 90, 153, 0.08), rgba(61, 90, 153, 1)); }
 
-/* NUMBERS GRID */
-.numbers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0 3rem;
-}
-.number-item {
-  text-align: left;
-}
-.number-item-value {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: 2rem;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.number-item-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
+  .findings { margin-top: 8px; }
+  .findings > div { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 0 24px; padding: 22px 0; border-top: 1px solid var(--rule); }
+  .findings > div:first-child { border-top: 0; }
+  .findings .big { grid-row: span 2; }
+  .findings h3 { font-size: 22px; font-stretch: 82%; margin-bottom: 8px; }
+  .findings .big { font-family: var(--sans); font-size: 34px; font-weight: 800; font-stretch: 72%; line-height: 1; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .findings p { font-size: 17px; line-height: 1.6; }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .stack { grid-template-columns: 1fr; }
-  .stack > div:first-child { border-right: none; border-bottom: 1px solid var(--rule-light); }
-  .bigstat { border-right: none; border-bottom: 1px solid var(--rule-light); }
-  .bigstat:last-child { border-bottom: none; }
-  .heatmap { grid-template-columns: 35px repeat(24, 1fr); font-size: 0.5rem; }
-  .heatmap-cell { min-height: 18px; }
-  .chart-wrap.full { margin: 3rem 0; padding: 1.5rem; }
-}
+  .notes { font-size: 17px; }
+  .notes h3 { font-size: 20px; font-stretch: 85%; margin: 26px 0 8px; }
+  .notes ul { padding-left: 20px; margin: 0 0 12px; }
+  .end { margin: 64px 0 0; padding: 32px 0 48px; border-top: 2px solid var(--ink); font-family: var(--sans); }
+  .end p { font-family: var(--serif); }
+  .end ul { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 18px; }
 
-/* FOOTNOTE */
-.footnote {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--muted);
-  margin-top: 1.5rem;
-  letter-spacing: 0.05em;
-  line-height: 1.6;
-}
-.footnote strong { color: var(--ink); }
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: #fff; font-family: var(--sans); font-size: 14px; line-height: 1.35; padding: 7px 10px; border-radius: 4px; max-width: 280px; opacity: 0; }
+  #tip.on { opacity: 1; }
 
-/* INSIGHT BOX */
-.insight {
-  background: var(--ink);
-  color: var(--paper);
-  padding: 2.5rem 2rem;
-  margin: 3rem 0;
-  position: relative;
-}
-.insight-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: var(--accent-2);
-  margin-bottom: 1rem;
-}
-.insight h4 {
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  font-style: italic;
-  font-size: 1.7rem;
-  line-height: 1.2;
-  color: var(--paper);
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-/* Smooth load */
-@keyframes fadeup {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.hero h1, .hero-deck, .hero-kicker, .hero-meta {
-  animation: fadeup 0.8s ease-out backwards;
-}
-.hero-kicker { animation-delay: 0.1s; }
-.hero h1 { animation-delay: 0.2s; }
-.hero-deck { animation-delay: 0.4s; }
-.hero-meta { animation-delay: 0.6s; }
-
+  @media (max-width: 760px) {
+    body { font-size: 18px; }
+    .col, .wide { padding: 0 16px; }
+    .dek { font-size: 21px; }
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .verdict { grid-template-columns: 1fr; }
+    .verdict > div + div { border-left: 0; border-top: 2px solid var(--ink); }
+    .findings > div { grid-template-columns: 1fr; }
+    .findings .big { grid-row: auto; }
+    h2 { font-size: 32px; }
+    .heat { grid-template-columns: 30px repeat(24, minmax(0, 1fr)); gap: 1px; font-size: 10px; }
+    .chart .ax { font-size: 15px; }
+    .chart .dl { font-size: 16px; }
+  }
+  @media print { #tip { display: none; } }
 </style>
 </head>
 <body>
 
-<header class="masthead">
-  <div class="container masthead-inner">
-    <div class="masthead-title">The Numbers Behind the Wheel</div>
-    <div class="masthead-meta">A Data Case Study &middot; 2026</div>
-  </div>
+<header class="wide top">
+  <a class="mark" href="https://charleshildbold.com">Charlie Hildbold</a>
+  <a class="back" href="https://charleshildbold.com/#work">More of my work</a>
 </header>
 
-<section class="hero">
-  <div class="container">
-    <div class="hero-kicker">Self-Initiated Analysis</div>
-    <h1>I drove 158,940 miles<br>and found <span class="accent">a story</span> in the data.</h1>
-    <p class="hero-deck">
-      Over 1,040 active days behind the wheel, across three platforms and two states, I generated <strong>$327,729</strong> in net earnings — and a data trail rich enough to answer questions almost no driver ever asks. This is what I found when I treated my own gig-work like a research project.
-    </p>
-    <div class="hero-meta">
-      <div>
-        <div class="hero-meta-item-label">Period</div>
-        <div class="hero-meta-item-value">Jan 2023 – May 2026</div>
-      </div>
-      <div>
-        <div class="hero-meta-item-label">Data Sources</div>
-        <div class="hero-meta-item-value">4 platforms, 6 exports</div>
-      </div>
-      <div>
-        <div class="hero-meta-item-label">Records Analyzed</div>
-        <div class="hero-meta-item-value">415,000+ rows</div>
-      </div>
-      <div>
-        <div class="hero-meta-item-label">Tools</div>
-        <div class="hero-meta-item-value">Python · Pandas · Chart.js</div>
-      </div>
-    </div>
+<main>
+  <div class="col">
+    <h1>What rideshare really pays</h1>
+    <p class="dek">I reconciled three and a half years of my own driving data to answer one question: per hour of my time, what does this job actually pay? The app makes it look like about $95. The real number is $41.61.</p>
+    <div class="byline">A case study by Charlie Hildbold. Data from January 1, 2023 to May 9, 2026.</div>
+
+    <dl class="facts">
+      <div><dt>Trips</dt><dd>25,549</dd></div>
+      <div><dt>Hours on the clock</dt><dd>7,876</dd></div>
+      <div><dt>Miles</dt><dd>158,940</dd></div>
+      <div><dt>Net earnings</dt><dd>$327,729</dd></div>
+      <div><dt>Days driven</dt><dd>1,040</dd></div>
+      <div><dt>Raw data</dt><dd>415,000+ rows</dd></div>
+    </dl>
   </div>
-</section>
 
-<!-- SECTION 1: THE QUESTION -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part One — The Question</div>
-    <h2>What does an Uber driver actually <em>earn?</em></h2>
-    <p class="lede">
-      The number Uber shows you in the app is a fiction. So is the figure on your 1099. Both are technically true but neither answers the question that matters: <strong>per hour of your life, what does this work pay?</strong> The honest answer requires reconciling at least three different ledgers, none of which agree with each other.
-    </p>
-    <p>
-      I started driving for Uber in July 2018 to supplement income during a career transition. What began as a side gig became a multi-year operation that produced — without my realizing it — one of the richest personal datasets I'd ever encounter. Uber records every trip with timestamps, distances, surge multipliers, and per-line-item payments. Lyft tracks sessions and payouts. Gridwise logs total clocked time including the unpaid waiting and deadheading that Uber's data conveniently omits.
-    </p>
-    <p>
-      In May 2026 I requested the full archives. What follows is what I found when I joined them together.
-    </p>
+  <section class="col">
+    <h2>The app's number leaves out half the job</h2>
+    <p>Uber shows drivers what they earned while a rider was in the car. That skips the drive to the pickup, the wait in the airport lot, the empty drive home from a long trip, and the dead time between requests. All of that is still work, and none of it is paid.</p>
+    <p>I ran Gridwise the whole time, which logs every hour I was on the clock. Divide what I actually netted by those hours and the picture changes.</p>
 
-    <div class="bigstat-grid">
-      <div class="bigstat">
-        <div class="bigstat-label">Net Earnings</div>
-        <div class="bigstat-value accent">$327,729</div>
-        <div class="bigstat-detail">All platforms, all bonuses, after Uber/Lyft fees</div>
-      </div>
-      <div class="bigstat">
-        <div class="bigstat-label">True Hourly Rate</div>
-        <div class="bigstat-value">$41.61</div>
-        <div class="bigstat-detail">Per clocked hour — not "engaged" hour</div>
-      </div>
-      <div class="bigstat">
-        <div class="bigstat-label">Cost Per Mile Driven</div>
-        <div class="bigstat-value">$2.06</div>
-        <div class="bigstat-detail">Including the 30%+ of miles that pay nothing</div>
-      </div>
-      <div class="bigstat">
-        <div class="bigstat-label">Trips Completed</div>
-        <div class="bigstat-value">25,549</div>
-        <div class="bigstat-detail">3.24 rides per hour, on average</div>
-      </div>
+    <div class="verdict">
+      <div class="app"><div class="n">$95<small>/hr</small></div><div class="l">What Uber's on-trip numbers imply. Gross fares, only the minutes a rider was in the car.</div></div>
+      <div class="real"><div class="n">$41.61<small>/hr</small></div><div class="l">What I netted after platform fees, across all 7,876 hours on the clock.</div></div>
     </div>
-  </div>
-</section>
+    <p>The app's number is about 2.3 times too high. That's not a lie, it's measuring the wrong thing. If you only ever look at the app, you'll badly overestimate what an hour of this work is worth.</p>
+  </section>
 
-<!-- SECTION 2: METHODOLOGY -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Two — Methodology</div>
-    <h2>Reconciling six exports that <em>disagreed</em> with each other.</h2>
-    <p>
-      The single hardest part of this analysis was getting four different platforms to tell the same story. Each export had its own definition of a "trip," its own version of what counts as earnings, and its own set of inexplicable gaps. The 2024 Uber data showed me a $1,920 day — except I'd only completed four rides that day. The Lyft rides file had 1,484 trips but the payments file showed I'd been earning Lyft money during years where no rides existed in the rides export. Gridwise had hours but no platform attribution.
-    </p>
-    <div class="method-grid">
-      <div class="method-card">
-        <div class="method-card-num">01</div>
-        <h4>Source the truth</h4>
-        <p>Pulled raw data exports from Uber (trips + payments), Lyft (rides + sessions + payouts), and Gridwise (the only source with total clocked time including deadhead). Six CSVs, ~415,000 rows.</p>
-      </div>
-      <div class="method-card">
-        <div class="method-card-num">02</div>
-        <h4>Reconcile the gaps</h4>
-        <p>Gridwise hours matched Uber payments within $1K over three years. The $1,920 outlier turned out to be a screenshot-confirmed back-pay settlement Uber excluded from the standard ledger. Diagnosed via cross-referencing line-item categories.</p>
-      </div>
-      <div class="method-card">
-        <div class="method-card-num">03</div>
-        <h4>Compute true economics</h4>
-        <p>Built unified daily and monthly aggregates. Calculated $/clocked-hour (not $/engaged-hour), per-trip net after platform fees, and the IRS mileage deduction across 158,940 miles.</p>
-      </div>
-      <div class="method-card">
-        <div class="method-card-num">04</div>
-        <h4>Find the patterns</h4>
-        <p>Decomposed by day-of-week, hour-of-day, surge tier, airport vs city, and platform. Identified the day where 47% of revenue concentrates, and the surge windows that generate disproportionate earnings.</p>
-      </div>
+  <section class="col">
+    <h2>Getting four sources to agree</h2>
+    <p>No single export told the whole story, and they didn't agree with each other. Most of the work was making them line up.</p>
+    <ol class="steps">
+      <li><b>Pull everything</b>Uber's trip history (46,548 rows) and payment ledger (368,869 line items), Lyft's rides, sessions and payouts, and Gridwise's daily earnings, hours and mileage. Six files, 415,000+ rows.</li>
+      <li><b>Reconcile the ledgers</b>Gridwise's earnings totals matched Uber's payment ledger to within $1,000 over three years. The biggest single gap came down to one day.</li>
+      <li><b>Explain the outliers</b>My best day on paper was February 28, 2024: $1,920.98 on four rides. It turned out to be a $1,868.16 EV settlement Uber paid outside its normal earnings records. It's real money, so it stays in the totals, and it's flagged on every chart.</li>
+      <li><b>Use the right unit</b>Everything is per hour on the clock, per mile and per trip, net of platform fees. Not per hour with a rider in the car.</li>
+    </ol>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Year</th><th scope="col">Days</th><th scope="col">Trips</th><th scope="col">Net earnings</th><th scope="col">Hours</th><th scope="col">Miles</th><th scope="col">Per hour</th><th scope="col">IRS mileage deduction</th></tr></thead>
+        <tbody><tr><th scope="row">2023</th><td>306</td><td>7,565</td><td>$94,277</td><td>2,242.6</td><td>44,730</td><td><b>$42.04</b></td><td>$29,299</td></tr><tr><th scope="row">2024</th><td>312</td><td>7,595</td><td>$97,906</td><td>2,283.9</td><td>46,882</td><td><b>$42.87</b></td><td>$31,411</td></tr><tr><th scope="row">2025</th><td>312</td><td>7,718</td><td>$98,753</td><td>2,462.5</td><td>49,754</td><td><b>$40.10</b></td><td>$34,828</td></tr><tr><th scope="row">2026 so far</th><td>110</td><td>2,671</td><td>$36,794</td><td>887.4</td><td>17,573</td><td><b>$41.46</b></td><td>$12,741</td></tr><tr class="tot"><th scope="row">Total</th><td>1,040</td><td>25,549</td><td>$327,729</td><td>7,876.4</td><td>158,940</td><td><b>$41.61</b></td><td>$108,278</td></tr></tbody>
+      </table>
     </div>
-  </div>
-</section>
+    <p class="notes" style="color:var(--ink-2);font-family:var(--sans);font-size:15px">The deduction column is miles driven times the IRS standard mileage rate for that year. Other per-unit numbers for the whole period: $2.06 per mile, $12.83 per trip, 3.24 rides per hour, 20.2 mph average.</p>
+  </section>
 
-<!-- SECTION 3: HEADLINE FINDING -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Three — The Topline</div>
-    <h2>The advertised hourly wage isn't <em>wrong.</em> It's just measuring the wrong thing.</h2>
-    <p class="lede">
-      If you look at Uber's data alone, my "on-trip" earnings averaged $95 per hour. That sounds great. Now subtract the time spent driving toward riders, waiting at the airport queue, repositioning after a long trip, sitting through dispatch lulls — all the time the meter doesn't run but the work continues. The honest rate is less than half.
-    </p>
+  <section class="col">
+    <h2>Steady, month after month</h2>
+    <p>Outside the settlement month, every full month landed between about $6,500 and $9,600. The hourly rate barely moved year to year: $42.04, $42.87, $40.10, and $41.46 so far in 2026. The job is consistent. The question is how to make it pay more.</p>
+    <figure>
+      <div class="fig-title">Net earnings by month</div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="Monthly net earnings, January 2023 to May 2026" class="chart"><line x1="56" x2="752" y1="266.0" y2="266.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="270.0" text-anchor="end" class="ax">$0</text><line x1="56" x2="752" y1="182.7" y2="182.7" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="186.7" text-anchor="end" class="ax">$4k</text><line x1="56" x2="752" y1="99.3" y2="99.3" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="103.3" text-anchor="end" class="ax">$8k</text><line x1="56" x2="752" y1="16.0" y2="16.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="20.0" text-anchor="end" class="ax">$12k</text><g class="hit" data-tip="Jan 2023: $6,853 net, 182 hours, $37.65/hr"><rect x="56.0" y="16" width="17.0" height="250" fill="transparent"/><path d="M57.0,266.0 V127.2 Q57.0,123.2 61.0,123.2 H68.0 Q72.0,123.2 72.0,127.2 V266.0 Z" fill="#3D5A99"/></g><text x="64.5" y="288" text-anchor="middle" class="ax">2023</text><g class="hit" data-tip="Feb 2023: $6,990 net, 165 hours, $42.36/hr"><rect x="73.0" y="16" width="17.0" height="250" fill="transparent"/><path d="M74.0,266.0 V124.4 Q74.0,120.4 78.0,120.4 H85.0 Q89.0,120.4 89.0,124.4 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Mar 2023: $7,400 net, 177 hours, $41.81/hr"><rect x="90.0" y="16" width="17.0" height="250" fill="transparent"/><path d="M91.0,266.0 V115.8 Q91.0,111.8 95.0,111.8 H101.9 Q105.9,111.8 105.9,115.8 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Apr 2023: $6,547 net, 147 hours, $44.54/hr"><rect x="106.9" y="16" width="17.0" height="250" fill="transparent"/><path d="M107.9,266.0 V133.6 Q107.9,129.6 111.9,129.6 H118.9 Q122.9,129.6 122.9,133.6 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="May 2023: $6,710 net, 163 hours, $41.14/hr"><rect x="123.9" y="16" width="17.0" height="250" fill="transparent"/><path d="M124.9,266.0 V130.2 Q124.9,126.2 128.9,126.2 H135.9 Q139.9,126.2 139.9,130.2 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jun 2023: $8,358 net, 192 hours, $43.51/hr"><rect x="140.9" y="16" width="17.0" height="250" fill="transparent"/><path d="M141.9,266.0 V95.9 Q141.9,91.9 145.9,91.9 H152.9 Q156.9,91.9 156.9,95.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jul 2023: $8,787 net, 205 hours, $42.78/hr"><rect x="157.9" y="16" width="17.0" height="250" fill="transparent"/><path d="M158.9,266.0 V86.9 Q158.9,82.9 162.9,82.9 H169.8 Q173.8,82.9 173.8,86.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Aug 2023: $8,274 net, 200 hours, $41.45/hr"><rect x="174.8" y="16" width="17.0" height="250" fill="transparent"/><path d="M175.8,266.0 V97.6 Q175.8,93.6 179.8,93.6 H186.8 Q190.8,93.6 190.8,97.6 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Sep 2023: $9,330 net, 204 hours, $45.74/hr"><rect x="191.8" y="16" width="17.0" height="250" fill="transparent"/><path d="M192.8,266.0 V75.6 Q192.8,71.6 196.8,71.6 H203.8 Q207.8,71.6 207.8,75.6 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Oct 2023: $9,248 net, 200 hours, $46.33/hr"><rect x="208.8" y="16" width="17.0" height="250" fill="transparent"/><path d="M209.8,266.0 V77.3 Q209.8,73.3 213.8,73.3 H220.8 Q224.8,73.3 224.8,77.3 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Nov 2023: $7,800 net, 199 hours, $39.11/hr"><rect x="225.8" y="16" width="17.0" height="250" fill="transparent"/><path d="M226.8,266.0 V107.5 Q226.8,103.5 230.8,103.5 H237.7 Q241.7,103.5 241.7,107.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Dec 2023: $7,980 net, 208 hours, $38.29/hr"><rect x="242.7" y="16" width="17.0" height="250" fill="transparent"/><path d="M243.7,266.0 V103.7 Q243.7,99.7 247.7,99.7 H254.7 Q258.7,99.7 258.7,103.7 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jan 2024: $7,272 net, 195 hours, $37.31/hr"><rect x="259.7" y="16" width="17.0" height="250" fill="transparent"/><path d="M260.7,266.0 V118.5 Q260.7,114.5 264.7,114.5 H271.7 Q275.7,114.5 275.7,118.5 V266.0 Z" fill="#3D5A99"/></g><text x="268.2" y="288" text-anchor="middle" class="ax">2024</text><g class="hit" data-tip="Feb 2024: $11,366 net, 188 hours, $60.49/hr. Includes the $1,868 EV settlement."><rect x="276.7" y="16" width="17.0" height="250" fill="transparent"/><path d="M277.7,266.0 V33.2 Q277.7,29.2 281.7,29.2 H288.7 Q292.7,29.2 292.7,33.2 V266.0 Z" fill="#A8262F"/></g><text x="285.2" y="22.2" text-anchor="middle" class="dl">EV settlement</text><g class="hit" data-tip="Mar 2024: $6,762 net, 164 hours, $41.36/hr"><rect x="293.7" y="16" width="17.0" height="250" fill="transparent"/><path d="M294.7,266.0 V129.1 Q294.7,125.1 298.7,125.1 H305.6 Q309.6,125.1 309.6,129.1 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Apr 2024: $7,772 net, 185 hours, $41.97/hr"><rect x="310.6" y="16" width="17.0" height="250" fill="transparent"/><path d="M311.6,266.0 V108.1 Q311.6,104.1 315.6,104.1 H322.6 Q326.6,104.1 326.6,108.1 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="May 2024: $8,013 net, 196 hours, $40.99/hr"><rect x="327.6" y="16" width="17.0" height="250" fill="transparent"/><path d="M328.6,266.0 V103.1 Q328.6,99.1 332.6,99.1 H339.6 Q343.6,99.1 343.6,103.1 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jun 2024: $7,387 net, 185 hours, $40.00/hr"><rect x="344.6" y="16" width="17.0" height="250" fill="transparent"/><path d="M345.6,266.0 V116.1 Q345.6,112.1 349.6,112.1 H356.6 Q360.6,112.1 360.6,116.1 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jul 2024: $8,165 net, 214 hours, $38.15/hr"><rect x="361.6" y="16" width="17.0" height="250" fill="transparent"/><path d="M362.6,266.0 V99.9 Q362.6,95.9 366.6,95.9 H373.5 Q377.5,95.9 377.5,99.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Aug 2024: $8,385 net, 210 hours, $39.93/hr"><rect x="378.5" y="16" width="17.0" height="250" fill="transparent"/><path d="M379.5,266.0 V95.3 Q379.5,91.3 383.5,91.3 H390.5 Q394.5,91.3 394.5,95.3 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Sep 2024: $8,105 net, 186 hours, $43.46/hr"><rect x="395.5" y="16" width="17.0" height="250" fill="transparent"/><path d="M396.5,266.0 V101.1 Q396.5,97.1 400.5,97.1 H407.5 Q411.5,97.1 411.5,101.1 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Oct 2024: $8,354 net, 182 hours, $45.77/hr"><rect x="412.5" y="16" width="17.0" height="250" fill="transparent"/><path d="M413.5,266.0 V96.0 Q413.5,92.0 417.5,92.0 H424.5 Q428.5,92.0 428.5,96.0 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Nov 2024: $8,094 net, 189 hours, $42.76/hr"><rect x="429.5" y="16" width="17.0" height="250" fill="transparent"/><path d="M430.5,266.0 V101.4 Q430.5,97.4 434.5,97.4 H441.4 Q445.4,97.4 445.4,101.4 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Dec 2024: $8,231 net, 190 hours, $43.34/hr"><rect x="446.4" y="16" width="17.0" height="250" fill="transparent"/><path d="M447.4,266.0 V98.5 Q447.4,94.5 451.4,94.5 H458.4 Q462.4,94.5 462.4,98.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jan 2025: $8,088 net, 199 hours, $40.70/hr"><rect x="463.4" y="16" width="17.0" height="250" fill="transparent"/><path d="M464.4,266.0 V101.5 Q464.4,97.5 468.4,97.5 H475.4 Q479.4,97.5 479.4,101.5 V266.0 Z" fill="#3D5A99"/></g><text x="471.9" y="288" text-anchor="middle" class="ax">2025</text><g class="hit" data-tip="Feb 2025: $7,128 net, 179 hours, $39.74/hr"><rect x="480.4" y="16" width="17.0" height="250" fill="transparent"/><path d="M481.4,266.0 V121.5 Q481.4,117.5 485.4,117.5 H492.4 Q496.4,117.5 496.4,121.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Mar 2025: $8,800 net, 210 hours, $42.01/hr"><rect x="497.4" y="16" width="17.0" height="250" fill="transparent"/><path d="M498.4,266.0 V86.7 Q498.4,82.7 502.4,82.7 H509.3 Q513.3,82.7 513.3,86.7 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Apr 2025: $7,667 net, 194 hours, $39.46/hr"><rect x="514.3" y="16" width="17.0" height="250" fill="transparent"/><path d="M515.3,266.0 V110.3 Q515.3,106.3 519.3,106.3 H526.3 Q530.3,106.3 530.3,110.3 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="May 2025: $8,747 net, 213 hours, $41.08/hr"><rect x="531.3" y="16" width="17.0" height="250" fill="transparent"/><path d="M532.3,266.0 V87.8 Q532.3,83.8 536.3,83.8 H543.3 Q547.3,83.8 547.3,87.8 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jun 2025: $8,258 net, 206 hours, $40.09/hr"><rect x="548.3" y="16" width="17.0" height="250" fill="transparent"/><path d="M549.3,266.0 V97.9 Q549.3,93.9 553.3,93.9 H560.3 Q564.3,93.9 564.3,97.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jul 2025: $7,800 net, 208 hours, $37.52/hr"><rect x="565.3" y="16" width="17.0" height="250" fill="transparent"/><path d="M566.3,266.0 V107.5 Q566.3,103.5 570.3,103.5 H577.2 Q581.2,103.5 581.2,107.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Aug 2025: $8,086 net, 208 hours, $38.82/hr"><rect x="582.2" y="16" width="17.0" height="250" fill="transparent"/><path d="M583.2,266.0 V101.5 Q583.2,97.5 587.2,97.5 H594.2 Q598.2,97.5 598.2,101.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Sep 2025: $8,112 net, 209 hours, $38.87/hr"><rect x="599.2" y="16" width="17.0" height="250" fill="transparent"/><path d="M600.2,266.0 V101.0 Q600.2,97.0 604.2,97.0 H611.2 Q615.2,97.0 615.2,101.0 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Oct 2025: $9,580 net, 236 hours, $40.68/hr"><rect x="616.2" y="16" width="17.0" height="250" fill="transparent"/><path d="M617.2,266.0 V70.4 Q617.2,66.4 621.2,66.4 H628.2 Q632.2,66.4 632.2,70.4 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Nov 2025: $8,663 net, 209 hours, $41.45/hr"><rect x="633.2" y="16" width="17.0" height="250" fill="transparent"/><path d="M634.2,266.0 V89.5 Q634.2,85.5 638.2,85.5 H645.1 Q649.1,85.5 649.1,89.5 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Dec 2025: $7,823 net, 192 hours, $40.68/hr"><rect x="650.1" y="16" width="17.0" height="250" fill="transparent"/><path d="M651.1,266.0 V107.0 Q651.1,103.0 655.1,103.0 H662.1 Q666.1,103.0 666.1,107.0 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Jan 2026: $7,753 net, 208 hours, $37.20/hr"><rect x="667.1" y="16" width="17.0" height="250" fill="transparent"/><path d="M668.1,266.0 V108.5 Q668.1,104.5 672.1,104.5 H679.1 Q683.1,104.5 683.1,108.5 V266.0 Z" fill="#3D5A99"/></g><text x="675.6" y="288" text-anchor="middle" class="ax">2026</text><g class="hit" data-tip="Feb 2026: $8,310 net, 194 hours, $42.77/hr"><rect x="684.1" y="16" width="17.0" height="250" fill="transparent"/><path d="M685.1,266.0 V96.9 Q685.1,92.9 689.1,92.9 H696.1 Q700.1,92.9 700.1,96.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Mar 2026: $9,318 net, 204 hours, $45.63/hr"><rect x="701.1" y="16" width="17.0" height="250" fill="transparent"/><path d="M702.1,266.0 V75.9 Q702.1,71.9 706.1,71.9 H713.0 Q717.0,71.9 717.0,75.9 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="Apr 2026: $9,200 net, 223 hours, $41.22/hr"><rect x="718.0" y="16" width="17.0" height="250" fill="transparent"/><path d="M719.0,266.0 V78.3 Q719.0,74.3 723.0,74.3 H730.0 Q734.0,74.3 734.0,78.3 V266.0 Z" fill="#3D5A99"/></g><g class="hit" data-tip="May 2026 (May 1 to 9 only): $2,212 net, 57 hours, $38.61/hr"><rect x="735.0" y="16" width="17.0" height="250" fill="transparent"/><path d="M736.0,266.0 V223.9 Q736.0,219.9 740.0,219.9 H747.0 Q751.0,219.9 751.0,223.9 V266.0 Z" fill="#3D5A99"/></g><line x1="56" x2="752" y1="266" y2="266" stroke="#4A5266" stroke-width="1"/></svg>
+      <figcaption>January 2023 to May 2026. <b>Red:</b> February 2024, which includes the $1,868 EV settlement. The last bar is May 1 to 9 only.</figcaption>
+    </figure>
+  </section>
 
-    <div class="stack">
+  <section class="col">
+    <h2>When I drive matters more than how much</h2>
+    <p>Saturday paid $53.24 an hour. Monday paid $33.11. Same car, same driver, same city, and 61% more for every hour. Per day the gap is just as wide: $453 on an average Saturday against $272 on a Tuesday. It's the biggest lever in the whole dataset.</p>
+    <figure>
+      <div class="fig-title">Net earnings per hour on the clock, by day</div>
+      <svg viewBox="0 0 760 280" role="img" aria-label="Net earnings per clocked hour by day of week" class="chart"><line x1="56" x2="752" y1="246.0" y2="246.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="250.0" text-anchor="end" class="ax">$0</text><line x1="56" x2="752" y1="169.3" y2="169.3" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="173.3" text-anchor="end" class="ax">$20</text><line x1="56" x2="752" y1="92.7" y2="92.7" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="96.7" text-anchor="end" class="ax">$40</text><line x1="56" x2="752" y1="16.0" y2="16.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="20.0" text-anchor="end" class="ax">$60</text><g class="hit" data-tip="Monday: $33.11/hr, $244 per day, 135 days driven"><rect x="56.0" y="16" width="99.4" height="230" fill="transparent"/><path d="M57.0,246.0 V123.1 Q57.0,119.1 61.0,119.1 H150.4 Q154.4,119.1 154.4,123.1 V246.0 Z" fill="#3D5A99"/></g><text x="105.7" y="268" text-anchor="middle" class="ax">Mon</text><text x="105.7" y="112.1" text-anchor="middle" class="dl">$33.11</text><g class="hit" data-tip="Tuesday: $36.71/hr, $272 per day, 77 days driven"><rect x="155.4" y="16" width="99.4" height="230" fill="transparent"/><path d="M156.4,246.0 V109.3 Q156.4,105.3 160.4,105.3 H249.9 Q253.9,105.3 253.9,109.3 V246.0 Z" fill="#3D5A99"/></g><text x="205.1" y="268" text-anchor="middle" class="ax">Tue</text><g class="hit" data-tip="Wednesday: $39.28/hr, $294 per day, 156 days driven"><rect x="254.9" y="16" width="99.4" height="230" fill="transparent"/><path d="M255.9,246.0 V99.4 Q255.9,95.4 259.9,95.4 H349.3 Q353.3,95.4 353.3,99.4 V246.0 Z" fill="#3D5A99"/></g><text x="304.6" y="268" text-anchor="middle" class="ax">Wed</text><g class="hit" data-tip="Thursday: $40.83/hr, $299 per day, 165 days driven"><rect x="354.3" y="16" width="99.4" height="230" fill="transparent"/><path d="M355.3,246.0 V93.5 Q355.3,89.5 359.3,89.5 H448.7 Q452.7,89.5 452.7,93.5 V246.0 Z" fill="#3D5A99"/></g><text x="404.0" y="268" text-anchor="middle" class="ax">Thu</text><g class="hit" data-tip="Friday: $37.99/hr, $307 per day, 172 days driven"><rect x="453.7" y="16" width="99.4" height="230" fill="transparent"/><path d="M454.7,246.0 V104.4 Q454.7,100.4 458.7,100.4 H548.1 Q552.1,100.4 552.1,104.4 V246.0 Z" fill="#3D5A99"/></g><text x="503.4" y="268" text-anchor="middle" class="ax">Fri</text><g class="hit" data-tip="Saturday: $53.24/hr, $453 per day, 171 days driven"><rect x="553.1" y="16" width="99.4" height="230" fill="transparent"/><path d="M554.1,246.0 V45.9 Q554.1,41.9 558.1,41.9 H647.6 Q651.6,41.9 651.6,45.9 V246.0 Z" fill="#A8262F"/></g><text x="602.9" y="268" text-anchor="middle" class="ax">Sat</text><text x="602.9" y="34.9" text-anchor="middle" class="dl">$53.24</text><g class="hit" data-tip="Sunday: $42.64/hr, $283 per day, 164 days driven"><rect x="652.6" y="16" width="99.4" height="230" fill="transparent"/><path d="M653.6,246.0 V86.5 Q653.6,82.5 657.6,82.5 H747.0 Q751.0,82.5 751.0,86.5 V246.0 Z" fill="#3D5A99"/></g><text x="702.3" y="268" text-anchor="middle" class="ax">Sun</text><line x1="56" x2="752" y1="246" y2="246" stroke="#4A5266" stroke-width="1"/></svg>
+      <figcaption>All 1,040 days driven. Hover any bar for days driven and the per-day average.</figcaption>
+    </figure>
+    <p>The hours tell the same story. 97% of my Uber trips started between 3 PM and midnight, heaviest on Friday and Saturday nights. Mornings are basically empty. That's my schedule, not the market's, so it says as much about how I work as where the demand is.</p>
+    <figure>
+      <div class="fig-title">Completed Uber trips by hour and day</div>
+      <div class="heat" role="img" aria-label="Completed Uber trips by hour and day of week"><span></span><span class="hh">12a</span><span class="hh"></span><span class="hh"></span><span class="hh">3a</span><span class="hh"></span><span class="hh"></span><span class="hh">6a</span><span class="hh"></span><span class="hh"></span><span class="hh">9a</span><span class="hh"></span><span class="hh"></span><span class="hh">12p</span><span class="hh"></span><span class="hh"></span><span class="hh">3p</span><span class="hh"></span><span class="hh"></span><span class="hh">6p</span><span class="hh"></span><span class="hh"></span><span class="hh">9p</span><span class="hh"></span><span class="hh"></span><span class="hd">Mon</span><span class="hc hit" style="background:rgba(61,90,153,0.094)" data-tip="Monday, 12 AM: 9 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Monday, 1 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Monday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Monday, 9 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Monday, 10 AM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.088)" data-tip="Monday, 11 AM: 5 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.100)" data-tip="Monday, 12 PM: 13 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.107)" data-tip="Monday, 1 PM: 18 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.127)" data-tip="Monday, 2 PM: 31 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.284)" data-tip="Monday, 3 PM: 134 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.519)" data-tip="Monday, 4 PM: 289 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.629)" data-tip="Monday, 5 PM: 361 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.748)" data-tip="Monday, 6 PM: 439 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.732)" data-tip="Monday, 7 PM: 429 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.778)" data-tip="Monday, 8 PM: 459 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.745)" data-tip="Monday, 9 PM: 437 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.638)" data-tip="Monday, 10 PM: 367 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.259)" data-tip="Monday, 11 PM: 118 trips"></span><span class="hd">Tue</span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 12 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 1 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Tuesday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Tuesday, 10 AM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.091)" data-tip="Tuesday, 11 AM: 7 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.089)" data-tip="Tuesday, 12 PM: 6 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.091)" data-tip="Tuesday, 1 PM: 7 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.107)" data-tip="Tuesday, 2 PM: 18 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.179)" data-tip="Tuesday, 3 PM: 65 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.311)" data-tip="Tuesday, 4 PM: 152 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.340)" data-tip="Tuesday, 5 PM: 171 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.436)" data-tip="Tuesday, 6 PM: 234 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.459)" data-tip="Tuesday, 7 PM: 249 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.480)" data-tip="Tuesday, 8 PM: 263 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.472)" data-tip="Tuesday, 9 PM: 258 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.386)" data-tip="Tuesday, 10 PM: 201 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.234)" data-tip="Tuesday, 11 PM: 101 trips"></span><span class="hd">Wed</span><span class="hc hit" style="background:rgba(61,90,153,0.095)" data-tip="Wednesday, 12 AM: 10 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.085)" data-tip="Wednesday, 1 AM: 3 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Wednesday, 10 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.083)" data-tip="Wednesday, 11 AM: 2 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Wednesday, 12 PM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Wednesday, 1 PM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.098)" data-tip="Wednesday, 2 PM: 12 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.299)" data-tip="Wednesday, 3 PM: 144 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.582)" data-tip="Wednesday, 4 PM: 330 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.634)" data-tip="Wednesday, 5 PM: 364 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.819)" data-tip="Wednesday, 6 PM: 486 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.863)" data-tip="Wednesday, 7 PM: 515 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.887)" data-tip="Wednesday, 8 PM: 531 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.895)" data-tip="Wednesday, 9 PM: 536 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.843)" data-tip="Wednesday, 10 PM: 502 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.361)" data-tip="Wednesday, 11 PM: 185 trips"></span><span class="hd">Thu</span><span class="hc hit" style="background:rgba(61,90,153,0.098)" data-tip="Thursday, 12 AM: 12 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 1 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 10 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Thursday, 11 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Thursday, 12 PM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.104)" data-tip="Thursday, 1 PM: 16 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.133)" data-tip="Thursday, 2 PM: 35 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.328)" data-tip="Thursday, 3 PM: 163 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.573)" data-tip="Thursday, 4 PM: 324 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.647)" data-tip="Thursday, 5 PM: 373 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.801)" data-tip="Thursday, 6 PM: 474 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.884)" data-tip="Thursday, 7 PM: 529 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.886)" data-tip="Thursday, 8 PM: 530 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.977)" data-tip="Thursday, 9 PM: 590 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.868)" data-tip="Thursday, 10 PM: 518 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.332)" data-tip="Thursday, 11 PM: 166 trips"></span><span class="hd">Fri</span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Friday, 12 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 1 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 10 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 11 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Friday, 12 PM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.088)" data-tip="Friday, 1 PM: 5 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.116)" data-tip="Friday, 2 PM: 24 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.329)" data-tip="Friday, 3 PM: 164 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.600)" data-tip="Friday, 4 PM: 342 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.796)" data-tip="Friday, 5 PM: 471 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.848)" data-tip="Friday, 6 PM: 505 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.913)" data-tip="Friday, 7 PM: 548 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.980)" data-tip="Friday, 8 PM: 592 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.992)" data-tip="Friday, 9 PM: 600 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.945)" data-tip="Friday, 10 PM: 569 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.737)" data-tip="Friday, 11 PM: 432 trips"></span><span class="hd">Sat</span><span class="hc hit" style="background:rgba(61,90,153,0.235)" data-tip="Saturday, 12 AM: 102 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Saturday, 1 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 2 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Saturday, 10 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.085)" data-tip="Saturday, 11 AM: 3 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.086)" data-tip="Saturday, 12 PM: 4 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.115)" data-tip="Saturday, 1 PM: 23 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.174)" data-tip="Saturday, 2 PM: 62 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.373)" data-tip="Saturday, 3 PM: 193 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.711)" data-tip="Saturday, 4 PM: 415 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.854)" data-tip="Saturday, 5 PM: 509 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.895)" data-tip="Saturday, 6 PM: 536 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.939)" data-tip="Saturday, 7 PM: 565 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.998)" data-tip="Saturday, 8 PM: 604 trips"></span><span class="hc hit" style="background:rgba(61,90,153,1.000)" data-tip="Saturday, 9 PM: 605 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.989)" data-tip="Saturday, 10 PM: 598 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.851)" data-tip="Saturday, 11 PM: 507 trips"></span><span class="hd">Sun</span><span class="hc hit" style="background:rgba(61,90,153,0.354)" data-tip="Sunday, 12 AM: 180 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.101)" data-tip="Sunday, 1 AM: 14 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Sunday, 2 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 3 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 4 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 5 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 6 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 7 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 8 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 9 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.000)" data-tip="Sunday, 10 AM: 0 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.082)" data-tip="Sunday, 11 AM: 1 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.083)" data-tip="Sunday, 12 PM: 2 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.092)" data-tip="Sunday, 1 PM: 8 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.132)" data-tip="Sunday, 2 PM: 34 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.264)" data-tip="Sunday, 3 PM: 121 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.585)" data-tip="Sunday, 4 PM: 332 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.769)" data-tip="Sunday, 5 PM: 453 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.865)" data-tip="Sunday, 6 PM: 516 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.875)" data-tip="Sunday, 7 PM: 523 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.840)" data-tip="Sunday, 8 PM: 500 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.819)" data-tip="Sunday, 9 PM: 486 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.519)" data-tip="Sunday, 10 PM: 289 trips"></span><span class="hc hit" style="background:rgba(61,90,153,0.218)" data-tip="Sunday, 11 PM: 91 trips"></span></div>
+      <div class="scale"><span>Fewer trips</span><i></i><span>More trips</span></div>
+      <figcaption>24,744 Uber trips with a recorded start time. Hover a cell for the count.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Uber's cut went up in 2026</h2>
+    <p>From Uber's per-line-item payment ledger, I divided Uber's total commission by everything riders paid. For three years it held right around 40%. In 2026 so far it's 44%. My hourly rate held steady through it, which means I'm working smarter to stay even, not getting ahead.</p>
+    <figure>
+      <div class="fig-title">Share of rider payments Uber kept</div>
+      <svg viewBox="0 0 760 250" role="img" aria-label="Uber take rate by year" class="chart"><line x1="56" x2="720" y1="216.0" y2="216.0" stroke="#D5D8D2"/><text x="48" y="220.0" text-anchor="end" class="ax">0%</text><line x1="56" x2="720" y1="179.6" y2="179.6" stroke="#D5D8D2"/><text x="48" y="183.6" text-anchor="end" class="ax">10%</text><line x1="56" x2="720" y1="143.2" y2="143.2" stroke="#D5D8D2"/><text x="48" y="147.2" text-anchor="end" class="ax">20%</text><line x1="56" x2="720" y1="106.8" y2="106.8" stroke="#D5D8D2"/><text x="48" y="110.8" text-anchor="end" class="ax">30%</text><line x1="56" x2="720" y1="70.4" y2="70.4" stroke="#D5D8D2"/><text x="48" y="74.4" text-anchor="end" class="ax">40%</text><line x1="56" x2="720" y1="34.0" y2="34.0" stroke="#D5D8D2"/><text x="48" y="38.0" text-anchor="end" class="ax">50%</text><polyline fill="none" stroke="#3D5A99" stroke-width="2" points="96.0,69.7 290.7,72.9 485.3,70.8 680.0,55.8"/><g class="hit" data-tip="2023: Uber kept 40.2% of what riders paid"><circle cx="96.0" cy="69.7" r="14" fill="transparent"/><circle cx="96.0" cy="69.7" r="5" fill="#3D5A99" stroke="#F2F3F1" stroke-width="2"/></g><text x="96.0" y="57.7" text-anchor="middle" class="dl">40.2%</text><text x="96.0" y="238" text-anchor="middle" class="ax">2023</text><g class="hit" data-tip="2024: Uber kept 39.3% of what riders paid"><circle cx="290.7" cy="72.9" r="14" fill="transparent"/><circle cx="290.7" cy="72.9" r="5" fill="#3D5A99" stroke="#F2F3F1" stroke-width="2"/></g><text x="290.7" y="60.9" text-anchor="middle" class="dl">39.3%</text><text x="290.7" y="238" text-anchor="middle" class="ax">2024</text><g class="hit" data-tip="2025: Uber kept 39.9% of what riders paid"><circle cx="485.3" cy="70.8" r="14" fill="transparent"/><circle cx="485.3" cy="70.8" r="5" fill="#3D5A99" stroke="#F2F3F1" stroke-width="2"/></g><text x="485.3" y="58.8" text-anchor="middle" class="dl">39.9%</text><text x="485.3" y="238" text-anchor="middle" class="ax">2025</text><g class="hit" data-tip="2026 so far: Uber kept 44% of what riders paid"><circle cx="680.0" cy="55.8" r="14" fill="transparent"/><circle cx="680.0" cy="55.8" r="5" fill="#3D5A99" stroke="#F2F3F1" stroke-width="2"/></g><text x="680.0" y="43.8" text-anchor="middle" class="dl">44%</text><text x="680.0" y="238" text-anchor="middle" class="ax">2026 so far</text><line x1="56" x2="720" y1="216" y2="216" stroke="#4A5266"/></svg>
+      <figcaption>Commission divided by total rider payments, from 368,869 Uber payment line items. 2026 runs through May 9.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Surge is a bonus, not a plan</h2>
+    <p>71% of my Uber trips had no surge at all, and those base-price trips are the backbone of the income. Surge pays well when it shows up. The 248 trips at 3x or higher averaged $32.19, about 2.2 times a normal $14.67 fare. But it's rare, and chasing it means driving empty to get there.</p>
+    <figure>
+      <div class="fig-title">Average fare by surge level</div>
+      <svg viewBox="0 0 760 260" role="img" aria-label="Average Uber fare by surge tier" class="chart"><line x1="56" x2="752" y1="226.0" y2="226.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="230.0" text-anchor="end" class="ax">$0</text><line x1="56" x2="752" y1="173.5" y2="173.5" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="177.5" text-anchor="end" class="ax">$10</text><line x1="56" x2="752" y1="121.0" y2="121.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="125.0" text-anchor="end" class="ax">$20</text><line x1="56" x2="752" y1="68.5" y2="68.5" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="72.5" text-anchor="end" class="ax">$30</text><line x1="56" x2="752" y1="16.0" y2="16.0" stroke="#D5D8D2" stroke-width="1"/><text x="48" y="20.0" text-anchor="end" class="ax">$40</text><g class="hit" data-tip="No surge: 17,615 trips, $14.67 average fare"><rect x="56.0" y="16" width="139.2" height="210" fill="transparent"/><path d="M57.0,226.0 V153.0 Q57.0,149.0 61.0,149.0 H190.2 Q194.2,149.0 194.2,153.0 V226.0 Z" fill="#3D5A99"/></g><text x="125.6" y="248" text-anchor="middle" class="ax">No surge</text><text x="125.6" y="142.0" text-anchor="middle" class="dl">$14.67</text><g class="hit" data-tip="1.0–1.5×: 4,533 trips, $16.51 average fare"><rect x="195.2" y="16" width="139.2" height="210" fill="transparent"/><path d="M196.2,226.0 V143.3 Q196.2,139.3 200.2,139.3 H329.4 Q333.4,139.3 333.4,143.3 V226.0 Z" fill="#3D5A99"/></g><text x="264.8" y="248" text-anchor="middle" class="ax">1.0–1.5×</text><text x="264.8" y="132.3" text-anchor="middle" class="dl">$16.51</text><g class="hit" data-tip="1.5–2.0×: 1,545 trips, $20.88 average fare"><rect x="334.4" y="16" width="139.2" height="210" fill="transparent"/><path d="M335.4,226.0 V120.4 Q335.4,116.4 339.4,116.4 H468.6 Q472.6,116.4 472.6,120.4 V226.0 Z" fill="#3D5A99"/></g><text x="404.0" y="248" text-anchor="middle" class="ax">1.5–2.0×</text><text x="404.0" y="109.4" text-anchor="middle" class="dl">$20.88</text><g class="hit" data-tip="2.0–3.0×: 803 trips, $25.24 average fare"><rect x="473.6" y="16" width="139.2" height="210" fill="transparent"/><path d="M474.6,226.0 V97.5 Q474.6,93.5 478.6,93.5 H607.8 Q611.8,93.5 611.8,97.5 V226.0 Z" fill="#3D5A99"/></g><text x="543.2" y="248" text-anchor="middle" class="ax">2.0–3.0×</text><text x="543.2" y="86.5" text-anchor="middle" class="dl">$25.24</text><g class="hit" data-tip="3.0×+: 248 trips, $32.19 average fare"><rect x="612.8" y="16" width="139.2" height="210" fill="transparent"/><path d="M613.8,226.0 V61.0 Q613.8,57.0 617.8,57.0 H747.0 Q751.0,57.0 751.0,61.0 V226.0 Z" fill="#3D5A99"/></g><text x="682.4" y="248" text-anchor="middle" class="ax">3.0×+</text><text x="682.4" y="50.0" text-anchor="middle" class="dl">$32.19</text><line x1="56" x2="752" y1="226" y2="226" stroke="#4A5266" stroke-width="1"/></svg>
+      <figcaption>24,744 Uber trips with surge data. Hover a bar for the trip count.</figcaption>
+    </figure>
+  </section>
+
+  <section class="col">
+    <h2>Three smaller findings</h2>
+    <div class="findings">
       <div>
-        <div class="stack-head">What Uber's app showed</div>
-        <div class="stack-value">$95<span style="font-size: 1.2rem; color: var(--muted)">/hr</span></div>
-        <div class="stack-context">On-trip gross fares only. Ignores 40%+ of clocked time.</div>
+        <div class="big">2.7x</div>
+        <h3>Airport runs pay, and I skip them</h3>
+        <p>Pittsburgh International trips averaged $42.69 against $15.76 for a city trip. Only 139 of my trips were airport runs, 0.6%. Doubling that would add roughly $1,100 a year, before counting the longer drive and the empty trip back.</p>
       </div>
       <div>
-        <div class="stack-head">What I actually earned</div>
-        <div class="stack-value" style="color: var(--accent)">$41.61<span style="font-size: 1.2rem; color: var(--muted)">/hr</span></div>
-        <div class="stack-context">Net of platform fees, across every minute I was working.</div>
-      </div>
-    </div>
-
-    <div class="insight">
-      <div class="insight-label">Key Finding</div>
-      <h4>"Engaged-time" pay, the metric platforms report, overstates real driver earnings by approximately 2.3×.</h4>
-    </div>
-
-    <h3>Annual breakdown</h3>
-    <p>The headline rate hides a more interesting story: my hourly compensation has been remarkably stable over three years, despite Uber raising its take rate from 17% to 44% over that span. I've been running faster to stay in place.</p>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Year</th>
-          <th class="num">Active Days</th>
-          <th class="num">Trips</th>
-          <th class="num">Net Earnings</th>
-          <th class="num">Hours</th>
-          <th class="num">Miles</th>
-          <th class="num">$/hr</th>
-          <th class="num">Tax-Deductible</th>
-        </tr>
-      </thead>
-      <tbody id="annual-tbody"></tbody>
-    </table>
-  </div>
-</section>
-
-<!-- SECTION 4: TRENDS CHART -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Four — Monthly View</div>
-    <h2>Three years of data, told <em>one month at a time.</em></h2>
-    <p class="lede">
-      A monthly view reveals patterns invisible at the annual level: the autumn surge that drives every year's earnings curve, the spring trough that I haven't successfully fought against, and the steady upward drift in my month-to-month consistency as I've learned the Pittsburgh market.
-    </p>
-    <div class="chart-wrap">
-      <div class="chart-title">Monthly net earnings, January 2023 – May 2026</div>
-      <div class="chart-subtitle">Includes the $1,868 February 2024 EV settlement payment Uber excluded from their standard earnings ledger.</div>
-      <div class="chart-canvas"><canvas id="monthlyChart"></canvas></div>
-      <div class="chart-note">Source · Gridwise daily exports, cross-validated with Uber driver_payments ledger</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 5: DAY OF WEEK -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Five — When the Money Is</div>
-    <h2>Saturday is worth <em>more than Monday and Tuesday combined.</em></h2>
-    <p>
-      If you've spent any time driving, this won't surprise you. What might surprise you is the magnitude. The average Saturday produced $453 in net earnings; the average Tuesday produced $272. Over three-plus years that delta has compounded into something like $50,000 of difference between my weekend earnings and my early-week earnings — for the same hours of work.
-    </p>
-    <p>
-      The deeper finding is what the day-of-week pattern reveals about <em>cost of complacency</em>. Tuesday is the cheapest day to take off, but Tuesday is also the day where my marginal hour earns the least. The optimization isn't to drive more on Tuesday — it's to never drive past 8 PM on Tuesday, and to always be driving by 5 PM on Saturday.
-    </p>
-    <div class="chart-wrap">
-      <div class="chart-title">Average earnings per day, by day of week</div>
-      <div class="chart-subtitle">Saturday produces 67% more revenue per active day than Tuesday.</div>
-      <div class="chart-canvas"><canvas id="dowChart"></canvas></div>
-      <div class="chart-note">Source · 1,040 active days, Gridwise daily aggregates</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 6: HEATMAP -->
-<section class="section">
-  <div class="container-wide">
-    <div class="container" style="padding: 0;">
-      <div class="section-num">Part Six — The Heatmap</div>
-      <h2>Every trip I've completed, plotted by <em>hour and day.</em></h2>
-      <p>
-        A single chart that tells you almost everything about how I actually work. The mass of activity sits between 3 PM and 11 PM, all week — but it intensifies on Friday and Saturday nights, and falls off a cliff after midnight. The dawn hours between 3 AM and 7 AM are essentially empty across all seven days. That's not market data. That's my data. Other drivers have very different shapes.
-      </p>
-    </div>
-    <div class="heatmap-wrap">
-      <div class="heatmap" id="heatmap"></div>
-      <div class="heatmap-legend">
-        <span>Fewer trips</span>
-        <div class="heatmap-legend-gradient"></div>
-        <span>More trips</span>
-      </div>
-    </div>
-    <div class="container" style="padding: 0;">
-      <p class="footnote"><strong>Reading the heatmap:</strong> Each cell represents one hour-of-week. Darker cells indicate more completed trips during that hour across the three-year period. Rows are Monday through Sunday (top to bottom); columns are hours 00 through 23 (left to right). Source: Uber completed-trips dataset, Jan 2023 – May 2026.</p>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 7: UBER TAKE RATE -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Seven — The Counterforce</div>
-    <h2>While my hourly rate stayed flat, Uber's <em>take rate doubled.</em></h2>
-    <p class="lede">
-      In 2018, Uber kept about 17 cents of every dollar a rider paid. By 2026, they're keeping 44 cents. This isn't a secret — Uber acknowledges it in their public filings — but the lived experience of it is striking. To earn the same $40 hour I earned in 2023, I have to be substantially more efficient in 2026, because Uber sits on a larger share of the rider's payment.
-    </p>
-    <div class="chart-wrap">
-      <div class="chart-title">Uber's effective take rate, 2023 – 2026</div>
-      <div class="chart-subtitle">Calculated as: total commission &divide; total inflows, from the per-line-item Uber payments ledger.</div>
-      <div class="chart-canvas"><canvas id="takeRateChart"></canvas></div>
-      <div class="chart-note">Source · Uber driver_payments export, 368,869 line items</div>
-    </div>
-    <div class="pull">
-      Drivers don't need a pay cut to lose money. They just need the platform to take a bigger slice of the same pie.
-      <div class="pull-attrib">— What the data taught me</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 8: SURGE -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Eight — Surge Economics</div>
-    <h2>67% of my trips have <em>zero surge.</em> The other 33% pay disproportionately.</h2>
-    <p>
-      Conventional wisdom says successful drivers chase surge. My data says something more nuanced: the vast majority of trips happen at base price, and those base trips form the backbone of consistent income. Surge isn't a strategy — it's a windfall that occurs alongside the strategy. The 248 trips I've completed at 3.0× or higher pulled an average fare of $32, more than double the no-surge average.
-    </p>
-    <div class="chart-wrap">
-      <div class="chart-title">Trips and average fares by surge tier</div>
-      <div class="chart-subtitle">Higher surge multipliers are rare but pay 2× to 3× the base rate.</div>
-      <div class="chart-canvas"><canvas id="surgeChart"></canvas></div>
-      <div class="chart-note">Source · Uber completed trips with surge_multiplier data, Jan 2023 – May 2026</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 9: AIRPORT, TIPS, UBER VS LYFT -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Nine — Hidden Levers</div>
-    <h2>Three patterns that drove <em>real money.</em></h2>
-    <h3>Airport trips pay 2.7× a normal trip — but I rarely take them.</h3>
-    <p>
-      Pittsburgh International Airport runs averaged $42.69 per trip, against $15.76 for the typical city trip. Over the analysis period I only completed 139 airport trips out of 24,744 — about 0.6%. If I doubled that share, my earnings would rise by roughly $2,000 a year at no additional time cost.
-    </p>
-    <div class="numbers-grid">
-      <div class="number-item">
-        <div class="number-item-value">$42.69</div>
-        <div class="number-item-label">Avg airport trip fare</div>
-      </div>
-      <div class="number-item">
-        <div class="number-item-value">$15.76</div>
-        <div class="number-item-label">Avg city trip fare</div>
-      </div>
-      <div class="number-item">
-        <div class="number-item-value">0.6%</div>
-        <div class="number-item-label">Of trips were airport runs</div>
-      </div>
-      <div class="number-item">
-        <div class="number-item-value">2.7×</div>
-        <div class="number-item-label">Airport fare premium</div>
-      </div>
-    </div>
-
-    <h3>Tipping rate of 39% — well above industry benchmarks.</h3>
-    <p>
-      Across the period I received tips on 39.1% of trips, totaling $35,911. Industry research suggests typical rideshare tip rates of 16% to 25%, so this represents one of the strongest signals in the dataset that customer experience matters. At an average $3.60 per tipped ride, tips alone funded the equivalent of roughly 2,800 extra trips' worth of base fare.
-    </p>
-
-    <h3>Uber and Lyft pay almost the same per hour — but I run 97% Uber.</h3>
-    <p>
-      When measured properly, Lyft pays $37.21 per clocked hour to Uber's $41.52 — a gap of just 10%. The per-trip narrative ($12.06 Lyft, $12.77 Uber) tells the same story. Lyft is a viable supplement, especially during the late-night bar-close window. I've under-utilized it.
-    </p>
-  </div>
-</section>
-
-<!-- SECTION 10: WHAT THIS PROVES -->
-<section class="section">
-  <div class="container">
-    <div class="section-num">Part Ten — What This Proves</div>
-    <h2>The point isn't the rideshare numbers. The point is <em>the method.</em></h2>
-    <p class="lede">
-      Most data-analysis projects look the same: a corporate dataset, a familiar business question, a chart that confirms what management already suspected. This project was the opposite. The data was my own. The reconciliation was non-obvious. The conclusions changed multiple times as new sources surfaced. That's what real analytics work looks like.
-    </p>
-    <p>
-      The skills demonstrated in this case study — ingesting messy multi-source data, identifying anomalies that warrant investigation (like the $1,920 day that turned out to be a settlement payment), reconciling ledgers that don't agree, computing the right unit economic rather than the obvious one, and presenting the findings narratively — are the same skills that turn data into business value at any organization.
-    </p>
-    <p>
-      I taught myself this stack over the course of the analysis: Python, Pandas, time-series reconciliation, financial waterfall analysis, statistical pattern detection, and the communication discipline of writing for an audience that needs to <em>understand</em> the numbers, not just see them.
-    </p>
-    <div class="insight">
-      <div class="insight-label">If you're hiring</div>
-      <h4>I bring this approach to every problem: source the data honestly, reconcile what doesn't fit, find the story, prove it numerically, and tell it cleanly.</h4>
-    </div>
-  </div>
-</section>
-
-<section class="colophon">
-  <div class="container">
-    <div class="section-num" style="color: var(--accent-2);">Colophon</div>
-    <h2>About this analysis.</h2>
-    <p style="max-width: 38em; margin-top: 1.5rem;">
-      Built over several days in May 2026 using Python, Pandas, NumPy, and Matplotlib for the data processing, with Chart.js powering the visualizations in this document. All earnings figures are net of platform fees and reconciled against multiple independent sources. No estimates appear in the headline numbers; every figure traces back to a primary data export.
-    </p>
-    <div class="colophon-grid">
-      <div>
-        <h5>Data Sources</h5>
-        <p>Uber driver_lifetime_trips (46,548 rows)<br>Uber driver_payments (368,869 line items)<br>Lyft driver_rides + sessions + payments (3 files)<br>Gridwise daily earnings + mileage</p>
+        <div class="big">39.1%</div>
+        <h3>Riders tip when the ride is good</h3>
+        <p>Riders tipped on 39.1% of my trips, $35,911 in total. That's money that only shows up when the ride goes right.</p>
       </div>
       <div>
-        <h5>Period Covered</h5>
-        <p>January 1, 2023 — May 9, 2026<br>1,040 active driving days<br>7,876 clocked hours<br>158,940 miles driven</p>
-      </div>
-      <div>
-        <h5>Reproducibility</h5>
-        <p>The full Python notebook, intermediate datasets, and reconciliation logic are available on request. Every number in this document is auditable end-to-end.</p>
-      </div>
-      <div>
-        <h5>Get in touch</h5>
-        <p>If you're hiring for analytics, data, or strategy roles, I'd love to talk about what I could do with your data.</p>
+        <div class="big">97%</div>
+        <h3>Nearly all Uber</h3>
+        <p>97% of my trips were Uber. Lyft paid almost the same per trip, $12.35 against $12.77, across 768 rides. It's a real backup option I've barely used.</p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
+  <section class="col notes">
+    <h2>Why I did this</h2>
+    <p>Most portfolio projects start with a clean dataset somebody else prepared. This one started with six files that disagreed, an outlier day that looked like an error, and a headline number that was technically true and still wrong. Sorting that out is most of what analytics work is in a front office or anywhere else: find the right source, reconcile what doesn't match, pick the unit that answers the real question, and explain it so someone can act on it.</p>
+
+    <h3>About the data</h3>
+    <ul>
+      <li>Sources: Uber driver_lifetime_trips (46,548 rows), Uber driver_payments (368,869 line items), Lyft rides, sessions and payments, and Gridwise daily earnings and mileage.</li>
+      <li>Period: January 1, 2023 to May 9, 2026. 1,040 days driven, 7,876 hours, 158,940 miles.</li>
+      <li>All earnings are net of platform fees. Headline figures are totals from the exports, not estimates.</li>
+      <li>Built with Python and pandas. The summary numbers behind every chart are in <a href="https://github.com/charles-hildbold/rideshare-analysis/blob/main/data/summary.json">data/summary.json</a>, and <a href="https://github.com/charles-hildbold/rideshare-analysis/blob/main/build.py">build.py</a> turns them into this page. The raw exports stay private because they're my personal financial records.</li>
+    </ul>
+  </section>
+
+  <div class="col">
+    <div class="end">
+      <h2>Want to talk about it?</h2>
+      <p>I'm looking for a front office or analytics role in the Pittsburgh area. I spent 15 years running minor league sports businesses before I went back for my master's in data analytics.</p>
+      <ul>
+        <li><a href="mailto:charles.hildbold@gmail.com">charles.hildbold@gmail.com</a></li>
+        <li><a href="https://charleshildbold.com">charleshildbold.com</a></li>
+        <li><a href="https://www.linkedin.com/in/charleshildbold">LinkedIn</a></li>
+        <li><a href="https://github.com/charles-hildbold/rideshare-analysis">This project on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<div id="tip" role="status" aria-live="polite"></div>
 <script>
-const D = {"period": "January 1, 2023 \u2013 May 9, 2026", "lifetime": {"days_period": 1222, "days_active": 1040, "pct_active": 85.1, "trips": 25549, "hours": 7876.4, "miles": 158940.2, "earn": 327729.24, "gross_earn": 325861.08, "settlement": 1868.16, "tax_ded": 108278.36, "taxable": 219450.88, "dollar_per_hour": 41.61, "dollar_per_mile": 2.06, "dollar_per_trip": 12.83, "avg_speed_mph": 20.2, "rides_per_hour": 3.24}, "annual": [{"year": 2023, "days": 306, "trips": 7565, "earn": 94276.83, "hours": 2242.6, "miles": 44730.4, "ded": 29298.53, "taxable": 64978.0, "dollar_per_hour": 42.04, "dollar_per_mile": 2.11, "dollar_per_trip": 12.46, "dollar_per_day": 308.0}, {"year": 2024, "days": 312, "trips": 7595, "earn": 97906.05, "hours": 2283.9, "miles": 46882.3, "ded": 31411.29, "taxable": 66495.0, "dollar_per_hour": 42.87, "dollar_per_mile": 2.09, "dollar_per_trip": 12.89, "dollar_per_day": 314.0}, {"year": 2025, "days": 312, "trips": 7718, "earn": 98752.56, "hours": 2462.5, "miles": 49754.2, "ded": 34827.94, "taxable": 63925.0, "dollar_per_hour": 40.1, "dollar_per_mile": 1.98, "dollar_per_trip": 12.8, "dollar_per_day": 317.0}, {"year": 2026, "days": 110, "trips": 2671, "earn": 36793.8, "hours": 887.4, "miles": 17573.3, "ded": 12740.6, "taxable": 24053.0, "dollar_per_hour": 41.46, "dollar_per_mile": 2.09, "dollar_per_trip": 13.78, "dollar_per_day": 334.0}], "service_split": {"uber_trips": 24781, "lyft_trips": 768, "uber_earn": 316376.26, "lyft_earn": 9484.82, "uber_per_trip": 12.77, "lyft_per_trip": 12.35}, "dow": [{"day": "Mon", "days": 135, "trips": 3140, "earn": 32944.24, "dollar_per_day": 244.0, "dollar_per_hour": 33.11}, {"day": "Tue", "days": 77, "trips": 1835, "earn": 20915.78, "dollar_per_day": 272.0, "dollar_per_hour": 36.71}, {"day": "Wed", "days": 156, "trips": 3725, "earn": 45824.52, "dollar_per_day": 294.0, "dollar_per_hour": 39.28}, {"day": "Thu", "days": 165, "trips": 3788, "earn": 49372.48, "dollar_per_day": 299.0, "dollar_per_hour": 40.83}, {"day": "Fri", "days": 172, "trips": 4563, "earn": 52864.81, "dollar_per_day": 307.0, "dollar_per_hour": 37.99}, {"day": "Sat", "days": 171, "trips": 4986, "earn": 77547.95, "dollar_per_day": 453.0, "dollar_per_hour": 53.24}, {"day": "Sun", "days": 164, "trips": 3512, "earn": 46391.3, "dollar_per_day": 283.0, "dollar_per_hour": 42.64}], "monthly": [{"date": "2023-01-01", "earn": 6853.06, "hours": 182.0, "trips": 661, "dollar_per_hour": 37.65}, {"date": "2023-02-01", "earn": 6989.7, "hours": 165.0, "trips": 601, "dollar_per_hour": 42.36}, {"date": "2023-03-01", "earn": 7399.65, "hours": 177.0, "trips": 599, "dollar_per_hour": 41.81}, {"date": "2023-04-01", "earn": 6546.92, "hours": 147.0, "trips": 519, "dollar_per_hour": 44.54}, {"date": "2023-05-01", "earn": 6710.31, "hours": 163.1, "trips": 541, "dollar_per_hour": 41.14}, {"date": "2023-06-01", "earn": 8357.78, "hours": 192.1, "trips": 646, "dollar_per_hour": 43.51}, {"date": "2023-07-01", "earn": 8787.06, "hours": 205.4, "trips": 683, "dollar_per_hour": 42.78}, {"date": "2023-08-01", "earn": 8274.2, "hours": 199.6, "trips": 645, "dollar_per_hour": 41.45}, {"date": "2023-09-01", "earn": 9330.44, "hours": 204.0, "trips": 668, "dollar_per_hour": 45.74}, {"date": "2023-10-01", "earn": 9248.19, "hours": 199.6, "trips": 671, "dollar_per_hour": 46.33}, {"date": "2023-11-01", "earn": 7799.51, "hours": 199.4, "trips": 658, "dollar_per_hour": 39.11}, {"date": "2023-12-01", "earn": 7980.01, "hours": 208.4, "trips": 673, "dollar_per_hour": 38.29}, {"date": "2024-01-01", "earn": 7271.74, "hours": 194.9, "trips": 627, "dollar_per_hour": 37.31}, {"date": "2024-02-01", "earn": 11366.07, "hours": 187.9, "trips": 625, "dollar_per_hour": 60.49}, {"date": "2024-03-01", "earn": 6762.22, "hours": 163.5, "trips": 534, "dollar_per_hour": 41.36}, {"date": "2024-04-01", "earn": 7772.26, "hours": 185.2, "trips": 605, "dollar_per_hour": 41.97}, {"date": "2024-05-01", "earn": 8013.27, "hours": 195.5, "trips": 635, "dollar_per_hour": 40.99}, {"date": "2024-06-01", "earn": 7387.15, "hours": 184.7, "trips": 618, "dollar_per_hour": 40.0}, {"date": "2024-07-01", "earn": 8164.72, "hours": 214.0, "trips": 719, "dollar_per_hour": 38.15}, {"date": "2024-08-01", "earn": 8384.53, "hours": 210.0, "trips": 755, "dollar_per_hour": 39.93}, {"date": "2024-09-01", "earn": 8105.42, "hours": 186.5, "trips": 651, "dollar_per_hour": 43.46}, {"date": "2024-10-01", "earn": 8353.74, "hours": 182.5, "trips": 613, "dollar_per_hour": 45.77}, {"date": "2024-11-01", "earn": 8094.04, "hours": 189.3, "trips": 609, "dollar_per_hour": 42.76}, {"date": "2024-12-01", "earn": 8230.89, "hours": 189.9, "trips": 604, "dollar_per_hour": 43.34}, {"date": "2025-01-01", "earn": 8087.63, "hours": 198.7, "trips": 627, "dollar_per_hour": 40.7}, {"date": "2025-02-01", "earn": 7128.47, "hours": 179.4, "trips": 560, "dollar_per_hour": 39.74}, {"date": "2025-03-01", "earn": 8800.25, "hours": 209.5, "trips": 647, "dollar_per_hour": 42.01}, {"date": "2025-04-01", "earn": 7666.81, "hours": 194.3, "trips": 610, "dollar_per_hour": 39.46}, {"date": "2025-05-01", "earn": 8746.71, "hours": 212.9, "trips": 639, "dollar_per_hour": 41.08}, {"date": "2025-06-01", "earn": 8258.47, "hours": 206.0, "trips": 645, "dollar_per_hour": 40.09}, {"date": "2025-07-01", "earn": 7800.35, "hours": 207.9, "trips": 665, "dollar_per_hour": 37.52}, {"date": "2025-08-01", "earn": 8086.16, "hours": 208.3, "trips": 693, "dollar_per_hour": 38.82}, {"date": "2025-09-01", "earn": 8112.17, "hours": 208.7, "trips": 678, "dollar_per_hour": 38.87}, {"date": "2025-10-01", "earn": 9579.68, "hours": 235.5, "trips": 749, "dollar_per_hour": 40.68}, {"date": "2025-11-01", "earn": 8663.32, "hours": 209.0, "trips": 652, "dollar_per_hour": 41.45}, {"date": "2025-12-01", "earn": 7822.54, "hours": 192.3, "trips": 553, "dollar_per_hour": 40.68}, {"date": "2026-01-01", "earn": 7753.14, "hours": 208.4, "trips": 636, "dollar_per_hour": 37.2}, {"date": "2026-02-01", "earn": 8310.3, "hours": 194.3, "trips": 579, "dollar_per_hour": 42.77}, {"date": "2026-03-01", "earn": 9318.38, "hours": 204.2, "trips": 625, "dollar_per_hour": 45.63}, {"date": "2026-04-01", "earn": 9199.9, "hours": 223.2, "trips": 658, "dollar_per_hour": 41.22}, {"date": "2026-05-01", "earn": 2212.08, "hours": 57.3, "trips": 173, "dollar_per_hour": 38.61}], "marginal_hour_value": 51.54, "session_intercept": -79.45, "top_day": {"date": "February 28, 2024 (Wednesday)", "earn": 1920.98, "hours": NaN, "trips": 4}, "hourly": [{"hour": 0, "trips": 314}, {"hour": 1, "trips": 19}, {"hour": 2, "trips": 1}, {"hour": 3, "trips": 0}, {"hour": 4, "trips": 0}, {"hour": 5, "trips": 0}, {"hour": 6, "trips": 0}, {"hour": 7, "trips": 0}, {"hour": 8, "trips": 0}, {"hour": 9, "trips": 1}, {"hour": 10, "trips": 8}, {"hour": 11, "trips": 18}, {"hour": 12, "trips": 33}, {"hour": 13, "trips": 81}, {"hour": 14, "trips": 216}, {"hour": 15, "trips": 984}, {"hour": 16, "trips": 2184}, {"hour": 17, "trips": 2702}, {"hour": 18, "trips": 3190}, {"hour": 19, "trips": 3358}, {"hour": 20, "trips": 3479}, {"hour": 21, "trips": 3512}, {"hour": 22, "trips": 3044}, {"hour": 23, "trips": 1600}], "heatmap": [{"dow": 0, "hour": 0, "count": 9}, {"dow": 0, "hour": 1, "count": 1}, {"dow": 0, "hour": 2, "count": 0}, {"dow": 0, "hour": 3, "count": 0}, {"dow": 0, "hour": 4, "count": 0}, {"dow": 0, "hour": 5, "count": 0}, {"dow": 0, "hour": 6, "count": 0}, {"dow": 0, "hour": 7, "count": 0}, {"dow": 0, "hour": 8, "count": 0}, {"dow": 0, "hour": 9, "count": 1}, {"dow": 0, "hour": 10, "count": 4}, {"dow": 0, "hour": 11, "count": 5}, {"dow": 0, "hour": 12, "count": 13}, {"dow": 0, "hour": 13, "count": 18}, {"dow": 0, "hour": 14, "count": 31}, {"dow": 0, "hour": 15, "count": 134}, {"dow": 0, "hour": 16, "count": 289}, {"dow": 0, "hour": 17, "count": 361}, {"dow": 0, "hour": 18, "count": 439}, {"dow": 0, "hour": 19, "count": 429}, {"dow": 0, "hour": 20, "count": 459}, {"dow": 0, "hour": 21, "count": 437}, {"dow": 0, "hour": 22, "count": 367}, {"dow": 0, "hour": 23, "count": 118}, {"dow": 1, "hour": 0, "count": 0}, {"dow": 1, "hour": 1, "count": 0}, {"dow": 1, "hour": 2, "count": 0}, {"dow": 1, "hour": 3, "count": 0}, {"dow": 1, "hour": 4, "count": 0}, {"dow": 1, "hour": 5, "count": 0}, {"dow": 1, "hour": 6, "count": 0}, {"dow": 1, "hour": 7, "count": 0}, {"dow": 1, "hour": 8, "count": 0}, {"dow": 1, "hour": 9, "count": 0}, {"dow": 1, "hour": 10, "count": 4}, {"dow": 1, "hour": 11, "count": 7}, {"dow": 1, "hour": 12, "count": 6}, {"dow": 1, "hour": 13, "count": 7}, {"dow": 1, "hour": 14, "count": 18}, {"dow": 1, "hour": 15, "count": 65}, {"dow": 1, "hour": 16, "count": 152}, {"dow": 1, "hour": 17, "count": 171}, {"dow": 1, "hour": 18, "count": 234}, {"dow": 1, "hour": 19, "count": 249}, {"dow": 1, "hour": 20, "count": 263}, {"dow": 1, "hour": 21, "count": 258}, {"dow": 1, "hour": 22, "count": 201}, {"dow": 1, "hour": 23, "count": 101}, {"dow": 2, "hour": 0, "count": 10}, {"dow": 2, "hour": 1, "count": 3}, {"dow": 2, "hour": 2, "count": 0}, {"dow": 2, "hour": 3, "count": 0}, {"dow": 2, "hour": 4, "count": 0}, {"dow": 2, "hour": 5, "count": 0}, {"dow": 2, "hour": 6, "count": 0}, {"dow": 2, "hour": 7, "count": 0}, {"dow": 2, "hour": 8, "count": 0}, {"dow": 2, "hour": 9, "count": 0}, {"dow": 2, "hour": 10, "count": 0}, {"dow": 2, "hour": 11, "count": 2}, {"dow": 2, "hour": 12, "count": 4}, {"dow": 2, "hour": 13, "count": 4}, {"dow": 2, "hour": 14, "count": 12}, {"dow": 2, "hour": 15, "count": 144}, {"dow": 2, "hour": 16, "count": 330}, {"dow": 2, "hour": 17, "count": 364}, {"dow": 2, "hour": 18, "count": 486}, {"dow": 2, "hour": 19, "count": 515}, {"dow": 2, "hour": 20, "count": 531}, {"dow": 2, "hour": 21, "count": 536}, {"dow": 2, "hour": 22, "count": 502}, {"dow": 2, "hour": 23, "count": 185}, {"dow": 3, "hour": 0, "count": 12}, {"dow": 3, "hour": 1, "count": 0}, {"dow": 3, "hour": 2, "count": 0}, {"dow": 3, "hour": 3, "count": 0}, {"dow": 3, "hour": 4, "count": 0}, {"dow": 3, "hour": 5, "count": 0}, {"dow": 3, "hour": 6, "count": 0}, {"dow": 3, "hour": 7, "count": 0}, {"dow": 3, "hour": 8, "count": 0}, {"dow": 3, "hour": 9, "count": 0}, {"dow": 3, "hour": 10, "count": 0}, {"dow": 3, "hour": 11, "count": 0}, {"dow": 3, "hour": 12, "count": 4}, {"dow": 3, "hour": 13, "count": 16}, {"dow": 3, "hour": 14, "count": 35}, {"dow": 3, "hour": 15, "count": 163}, {"dow": 3, "hour": 16, "count": 324}, {"dow": 3, "hour": 17, "count": 373}, {"dow": 3, "hour": 18, "count": 474}, {"dow": 3, "hour": 19, "count": 529}, {"dow": 3, "hour": 20, "count": 530}, {"dow": 3, "hour": 21, "count": 590}, {"dow": 3, "hour": 22, "count": 518}, {"dow": 3, "hour": 23, "count": 166}, {"dow": 4, "hour": 0, "count": 1}, {"dow": 4, "hour": 1, "count": 0}, {"dow": 4, "hour": 2, "count": 0}, {"dow": 4, "hour": 3, "count": 0}, {"dow": 4, "hour": 4, "count": 0}, {"dow": 4, "hour": 5, "count": 0}, {"dow": 4, "hour": 6, "count": 0}, {"dow": 4, "hour": 7, "count": 0}, {"dow": 4, "hour": 8, "count": 0}, {"dow": 4, "hour": 9, "count": 0}, {"dow": 4, "hour": 10, "count": 0}, {"dow": 4, "hour": 11, "count": 0}, {"dow": 4, "hour": 12, "count": 0}, {"dow": 4, "hour": 13, "count": 5}, {"dow": 4, "hour": 14, "count": 24}, {"dow": 4, "hour": 15, "count": 164}, {"dow": 4, "hour": 16, "count": 342}, {"dow": 4, "hour": 17, "count": 471}, {"dow": 4, "hour": 18, "count": 505}, {"dow": 4, "hour": 19, "count": 548}, {"dow": 4, "hour": 20, "count": 592}, {"dow": 4, "hour": 21, "count": 600}, {"dow": 4, "hour": 22, "count": 569}, {"dow": 4, "hour": 23, "count": 432}, {"dow": 5, "hour": 0, "count": 102}, {"dow": 5, "hour": 1, "count": 1}, {"dow": 5, "hour": 2, "count": 0}, {"dow": 5, "hour": 3, "count": 0}, {"dow": 5, "hour": 4, "count": 0}, {"dow": 5, "hour": 5, "count": 0}, {"dow": 5, "hour": 6, "count": 0}, {"dow": 5, "hour": 7, "count": 0}, {"dow": 5, "hour": 8, "count": 0}, {"dow": 5, "hour": 9, "count": 0}, {"dow": 5, "hour": 10, "count": 0}, {"dow": 5, "hour": 11, "count": 3}, {"dow": 5, "hour": 12, "count": 4}, {"dow": 5, "hour": 13, "count": 23}, {"dow": 5, "hour": 14, "count": 62}, {"dow": 5, "hour": 15, "count": 193}, {"dow": 5, "hour": 16, "count": 415}, {"dow": 5, "hour": 17, "count": 509}, {"dow": 5, "hour": 18, "count": 536}, {"dow": 5, "hour": 19, "count": 565}, {"dow": 5, "hour": 20, "count": 604}, {"dow": 5, "hour": 21, "count": 605}, {"dow": 5, "hour": 22, "count": 598}, {"dow": 5, "hour": 23, "count": 507}, {"dow": 6, "hour": 0, "count": 180}, {"dow": 6, "hour": 1, "count": 14}, {"dow": 6, "hour": 2, "count": 1}, {"dow": 6, "hour": 3, "count": 0}, {"dow": 6, "hour": 4, "count": 0}, {"dow": 6, "hour": 5, "count": 0}, {"dow": 6, "hour": 6, "count": 0}, {"dow": 6, "hour": 7, "count": 0}, {"dow": 6, "hour": 8, "count": 0}, {"dow": 6, "hour": 9, "count": 0}, {"dow": 6, "hour": 10, "count": 0}, {"dow": 6, "hour": 11, "count": 1}, {"dow": 6, "hour": 12, "count": 2}, {"dow": 6, "hour": 13, "count": 8}, {"dow": 6, "hour": 14, "count": 34}, {"dow": 6, "hour": 15, "count": 121}, {"dow": 6, "hour": 16, "count": 332}, {"dow": 6, "hour": 17, "count": 453}, {"dow": 6, "hour": 18, "count": 516}, {"dow": 6, "hour": 19, "count": 523}, {"dow": 6, "hour": 20, "count": 500}, {"dow": 6, "hour": 21, "count": 486}, {"dow": 6, "hour": 22, "count": 289}, {"dow": 6, "hour": 23, "count": 91}], "surge": [{"tier": "No surge", "trips": 17615, "avg_fare": 14.67}, {"tier": "1.0\u20131.5\u00d7", "trips": 4533, "avg_fare": 16.51}, {"tier": "1.5\u20132.0\u00d7", "trips": 1545, "avg_fare": 20.88}, {"tier": "2.0\u20133.0\u00d7", "trips": 803, "avg_fare": 25.24}, {"tier": "3.0\u00d7+", "trips": 248, "avg_fare": 32.19}], "airport": {"airport_trips": 139, "airport_avg_fare": 42.69, "city_trips": 24605, "city_avg_fare": 15.76}, "take_rate": [{"year": 2023, "rate": 40.2}, {"year": 2024, "rate": 39.3}, {"year": 2025, "rate": 39.9}, {"year": 2026, "rate": 44.0}], "tips_total": 35911.2, "tip_rate": 39.1};
-
-// Annual table
-const annualTbody = document.getElementById('annual-tbody');
-D.annual.forEach(row => {
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><span class="year-label">${row.year}${row.year===2026 ? ' <span style="font-style:italic;color:var(--muted);font-family:Fraunces;font-weight:400;font-size:0.85rem;"> (partial)</span>' : ''}</span></td>
-    <td class="num">${row.days}</td>
-    <td class="num">${row.trips.toLocaleString()}</td>
-    <td class="num">$${Math.round(row.earn).toLocaleString()}</td>
-    <td class="num">${row.hours.toLocaleString()}</td>
-    <td class="num">${Math.round(row.miles).toLocaleString()}</td>
-    <td class="num"><strong>$${row.dollar_per_hour}</strong></td>
-    <td class="num">$${Math.round(row.ded).toLocaleString()}</td>`;
-  annualTbody.appendChild(tr);
-});
-
-// Chart.js defaults
-Chart.defaults.font.family = "'Fraunces', Georgia, serif";
-Chart.defaults.color = '#1a1814';
-Chart.defaults.borderColor = '#c8c0b3';
-
-// Monthly chart
-const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-new Chart(monthlyCtx, {
-  type: 'bar',
-  data: {
-    labels: D.monthly.map(m => {
-      const d = new Date(m.date);
-      return d.toLocaleDateString('en-US', {month:'short', year:'2-digit'});
-    }),
-    datasets: [{
-      label: 'Monthly net earnings',
-      data: D.monthly.map(m => m.earn),
-      backgroundColor: '#c1440e',
-      borderRadius: 0,
-      barPercentage: 0.85,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1a1814',
-        titleFont: { family: 'JetBrains Mono', size: 11 },
-        bodyFont: { family: 'Fraunces', size: 13 },
-        padding: 12,
-        callbacks: {
-          label: (ctx) => '$' + Math.round(ctx.parsed.y).toLocaleString()
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: { 
-          font: { family: 'JetBrains Mono', size: 9 },
-          maxRotation: 0,
-          autoSkip: true,
-          maxTicksLimit: 12,
-        }
-      },
-      y: {
-        grid: { color: '#e8e1d3' },
-        ticks: {
-          font: { family: 'JetBrains Mono', size: 10 },
-          callback: (v) => '$' + (v/1000).toFixed(0) + 'K'
-        }
-      }
+  (function () {
+    var tip = document.getElementById('tip');
+    function show(el, x, y) {
+      tip.textContent = el.getAttribute('data-tip');
+      tip.classList.add('on');
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      var left = Math.min(Math.max(8, x - w / 2), window.innerWidth - w - 8);
+      var top = y - h - 14;
+      if (top < 8) top = y + 18;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
     }
-  }
-});
-
-// DOW chart
-const dowCtx = document.getElementById('dowChart').getContext('2d');
-new Chart(dowCtx, {
-  type: 'bar',
-  data: {
-    labels: D.dow.map(d => d.day),
-    datasets: [{
-      label: '$ per day',
-      data: D.dow.map(d => d.dollar_per_day),
-      backgroundColor: D.dow.map((d,i) => i===5 ? '#c1440e' : '#1a1814'),
-      borderRadius: 0,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1a1814',
-        callbacks: {
-          label: (ctx) => '$' + Math.round(ctx.parsed.y) + ' per active day'
-        }
-      },
-      datalabels: false
-    },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Fraunces', size: 14, weight: '600' } } },
-      y: { grid: { color: '#e8e1d3' }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => '$' + v } }
-    }
-  }
-});
-
-// Heatmap
-const heatmap = document.getElementById('heatmap');
-const dowNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-// Header row
-heatmap.innerHTML = '<div></div>' + Array.from({length:24}, (_,h) => `<div class="heatmap-label col">${String(h).padStart(2,'0')}</div>`).join('');
-const maxCount = Math.max(...D.heatmap.map(c => c.count));
-dowNames.forEach((name, dow) => {
-  heatmap.innerHTML += `<div class="heatmap-label">${name}</div>`;
-  for (let h = 0; h < 24; h++) {
-    const cell = D.heatmap.find(c => c.dow === dow && c.hour === h);
-    const count = cell ? cell.count : 0;
-    const intensity = count / maxCount;
-    const color = intensity === 0 
-      ? '#efe9de' 
-      : `rgba(193, 68, 14, ${0.1 + intensity * 0.9})`;
-    heatmap.innerHTML += `<div class="heatmap-cell" style="background:${color}" title="${name} ${String(h).padStart(2,'0')}:00 — ${count} trips"></div>`;
-  }
-});
-
-// Take rate chart
-const trCtx = document.getElementById('takeRateChart').getContext('2d');
-new Chart(trCtx, {
-  type: 'line',
-  data: {
-    labels: D.take_rate.map(t => t.year + (t.year===2026 ? ' (YTD)' : '')),
-    datasets: [{
-      label: "Uber's take rate (%)",
-      data: D.take_rate.map(t => t.rate),
-      borderColor: '#c1440e',
-      backgroundColor: 'rgba(193, 68, 14, 0.1)',
-      borderWidth: 3,
-      pointBackgroundColor: '#c1440e',
-      pointRadius: 8,
-      pointHoverRadius: 10,
-      tension: 0.2,
-      fill: true,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1a1814',
-        callbacks: {
-          label: (ctx) => ctx.parsed.y + '% — Uber keeps ' + ctx.parsed.y + ' cents of every dollar'
-        }
-      }
-    },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Fraunces', size: 13, weight: '600' } } },
-      y: { 
-        grid: { color: '#e8e1d3' },
-        beginAtZero: true,
-        max: 50,
-        ticks: { font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => v + '%' }
-      }
-    }
-  }
-});
-
-// Surge chart
-const surgeCtx = document.getElementById('surgeChart').getContext('2d');
-new Chart(surgeCtx, {
-  type: 'bar',
-  data: {
-    labels: D.surge.map(s => s.tier),
-    datasets: [
-      {
-        label: 'Trip count',
-        data: D.surge.map(s => s.trips),
-        backgroundColor: '#1a1814',
-        yAxisID: 'y',
-        borderRadius: 0,
-      },
-      {
-        label: 'Avg fare ($)',
-        data: D.surge.map(s => s.avg_fare),
-        type: 'line',
-        borderColor: '#c1440e',
-        backgroundColor: '#c1440e',
-        borderWidth: 3,
-        pointRadius: 7,
-        yAxisID: 'y1',
-        tension: 0.2,
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { 
-        position: 'top',
-        align: 'end',
-        labels: { font: { family: 'JetBrains Mono', size: 11 }, boxWidth: 12, boxHeight: 12 }
-      },
-      tooltip: { backgroundColor: '#1a1814' }
-    },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { family: 'Fraunces', size: 12, weight: '500' } } },
-      y: { 
-        type: 'linear',
-        position: 'left',
-        grid: { color: '#e8e1d3' },
-        ticks: { font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => (v/1000).toFixed(0)+'K' },
-        title: { display: true, text: 'Trips', font: { family: 'JetBrains Mono', size: 10 } }
-      },
-      y1: { 
-        type: 'linear',
-        position: 'right',
-        grid: { drawOnChartArea: false },
-        ticks: { font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => '$' + v },
-        title: { display: true, text: 'Avg fare', font: { family: 'JetBrains Mono', size: 10 } }
-      }
-    }
-  }
-});
+    function hide() { tip.classList.remove('on'); }
+    document.querySelectorAll('.hit').forEach(function (el) {
+      el.setAttribute('tabindex', '0');
+      el.addEventListener('mousemove', function (e) { show(el, e.clientX, e.clientY); });
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('focus', function () { var r = el.getBoundingClientRect(); show(el, r.left + r.width / 2, r.top); });
+      el.addEventListener('blur', hide);
+      el.addEventListener('touchstart', function (e) { var t = e.touches[0]; show(el, t.clientX, t.clientY); }, { passive: true });
+    });
+    window.addEventListener('scroll', hide, { passive: true });
+  })();
 </script>
 </body>
 </html>
