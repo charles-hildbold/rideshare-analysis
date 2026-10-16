@@ -1,6 +1,7 @@
 # Rideshare Analysis
 
-I've driven for Uber and Lyft since 2018. Somewhere along the way I realized
+I started driving for Uber in 2018 and went full time in March 2020. Somewhere
+along the way I realized
 I was sitting on a pretty detailed record of my own work, every trip, every
 payment, every mile, and nobody had ever actually sat down and worked out
 what the job pays once you account for all of it.
